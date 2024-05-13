@@ -5,6 +5,7 @@ import Capsule, {
   Environment,
   OAuthMethod,
 } from "@usecapsule/react-sdk";
+import { ethers } from 'ethers';
 
 // not sensitive
 const BETA_KEY = "d0b61c2c8865aaa2fb12886651627271";
@@ -58,7 +59,7 @@ setWalletAddress(undefined);
       alert("install metamask extension!!");
     }
   };
-
+  
 
   return (
     <div className="relative w-full bg-white">
