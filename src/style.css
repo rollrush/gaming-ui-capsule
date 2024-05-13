@@ -802,3 +802,22 @@ html, body{
 	margin-top: -25px;
 }
 /*chip end*/
+.signInButton{
+	position: absolute;
+    margin-top: 70px;
+	position: absolute;
+    margin-top: 70px;
+    margin-left: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    background-color: #ffec00;
+    padding: 10px 5px;
+    border-radius: 100%;
+    color: #000;
+    font-weight: bold;
+    top: 170px;
+    left: 150px;
+    height: 30px;
+    width: 70px;
+    border-radius: 5px;
+}
