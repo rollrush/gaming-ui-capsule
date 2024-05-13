@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { Menu, X } from "lucide-react";
 import Capsule, {
   CapsuleButton,
@@ -8,7 +8,6 @@ import Capsule, {
 
 // not sensitive
 const BETA_KEY = "d0b61c2c8865aaa2fb12886651627271";
-
 const menuItems = [
   {
     name: "Home",
@@ -31,6 +30,35 @@ function Navbar() {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+  const [walletAddress, setWalletAddress] = useState<string | undefined>(undefined);
+
+  async function checkIfLoggedIn(): Promise<void> {
+                  if (await capsule.isFullyLoggedIn()) {
+            setWalletAddress(Object.values(capsule.getWallets())[0]?.address);
+console.log(walletAddress);
+} else {
+setWalletAddress(undefined);
+}
+}
+  useEffect(() => {
+    checkIfLoggedIn();
+    console.log(walletAddress," this is wallet"); 
+  }, []);
+
+    const btnhandler = () => {
+    // Asking if metamask is already present or not
+    if ((window as any).ethereum) {
+      // res[0] for fetching a first wallet
+      (window as any).ethereum
+        .request({ method: "eth_requestAccounts" })
+        // .then((res: any) =>
+        //   accountChangeHandler(res[0])
+        // );
+    } else {
+      alert("install metamask extension!!");
+    }
+  };
+
 
   return (
     <div className="relative w-full bg-white">
@@ -107,6 +135,9 @@ function Navbar() {
             />{" "}
             {/* Capsule Wallet */}
           </button>
+          <button  onClick={btnhandler} className="h-auto ml-4 bg-orange-500 rounded-lg py-3 px-2">
+          Connect Wallet
+          </button>
         </div>
         <div className="lg:hidden">
           <Menu onClick={toggleMenu} className="h-6 w-6 cursor-pointer" />
@@ -165,6 +196,10 @@ function Navbar() {
                 >
                   Capsule
                 </button>
+                {/* <button >
+                  Wallet
+                </button> */}
+                
               </div>
             </div>
           </div>

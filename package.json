@@ -13,8 +13,11 @@
   "dependencies": {
     "@usecapsule/ethers-v6-integration": "1.3.0",
     "@usecapsule/react-sdk": "1.3.0",
+    "bootstrap": "^5.3.3",
+    "ethers": "^5.7.2",
     "lucide-react": "^0.378.0",
     "react": "^18.2.0",
+    "react-bootstrap": "^2.10.2",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
