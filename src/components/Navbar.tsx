@@ -5,7 +5,6 @@ import Capsule, {
   Environment,
   OAuthMethod,
 } from "@usecapsule/react-sdk";
-import { ethers } from 'ethers';
 
 // not sensitive
 const BETA_KEY = "d0b61c2c8865aaa2fb12886651627271";
@@ -31,14 +30,14 @@ function Navbar() {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-  const [walletAddress, setWalletAddress] = useState<string | undefined>(undefined);
+  const [walletAddress, setWalletAddress] = useState<string | undefined>("Connect Wallet");
 
   async function checkIfLoggedIn(): Promise<void> {
                   if (await capsule.isFullyLoggedIn()) {
             setWalletAddress(Object.values(capsule.getWallets())[0]?.address);
 console.log(walletAddress);
 } else {
-setWalletAddress(undefined);
+setWalletAddress("Connect Wallet");
 }
 }
   useEffect(() => {
@@ -52,9 +51,9 @@ setWalletAddress(undefined);
       // res[0] for fetching a first wallet
       (window as any).ethereum
         .request({ method: "eth_requestAccounts" })
-        // .then((res: any) =>
-        //   accountChangeHandler(res[0])
-        // );
+        .then((res: any) =>
+        setWalletAddress(res[0])
+        );
     } else {
       alert("install metamask extension!!");
     }
@@ -137,7 +136,7 @@ setWalletAddress(undefined);
             {/* Capsule Wallet */}
           </button>
           <button  onClick={btnhandler} className="h-auto ml-4 bg-orange-500 rounded-lg py-3 px-2">
-          Connect Wallet
+          {walletAddress}
           </button>
         </div>
         <div className="lg:hidden">
