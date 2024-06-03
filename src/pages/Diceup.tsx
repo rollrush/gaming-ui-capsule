@@ -81,7 +81,7 @@ const Diceup = () => {
           <p className="py-4">{modalText}</p>
         </div>
       </dialog>
-      <div className="h-[80vh] w-screen flex justify-center items-center flex-col">
+      <div className=" w-screen h-screen flex justify-center items-center flex-col">
         <h1 className="text-2xl">{reward}</h1>
         <div className="card  bg-base-100 shadow-xl w-max">
           <div className="flex justify-center">
