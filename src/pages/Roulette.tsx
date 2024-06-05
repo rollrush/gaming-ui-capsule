@@ -13,7 +13,14 @@ const Roulette = () => {
       document.body.removeChild(script);
     };
   }, [Link]);
-  return <div></div>;
+  return (
+    <div
+      style={{
+        backgroundColor: "rgb(1,109,41)",
+      }}
+      className=" h-screen absolute w-screen -z-10 "
+    ></div>
+  );
 };
 
 export default Roulette;
