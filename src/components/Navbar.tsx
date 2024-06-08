@@ -61,7 +61,7 @@ function Navbar() {
   };
 
   return (
-    <div className="relative w-full bg-white">
+    <div className="relative w-full backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
         <div className="inline-flex items-center space-x-2">
           <span>
@@ -82,7 +82,7 @@ function Navbar() {
                 <g
                   id="ui-gambling-website-lined-icnos-casinoshunter"
                   transform="translate(-342.000000, -412.000000)"
-                  fill="#252528"
+                  fill="white"
                   fillRule="nonzero"
                 >
                   <g
@@ -98,45 +98,47 @@ function Navbar() {
               </g>
             </svg>
           </span>
-          <span className="font-bold">RollRush</span>
+          <span className="font-bold text-white text-2xl underline decoration-yellow-500 ">Roll Rush</span>
         </div>
         <div className="hidden lg:block">
-          <ul className="inline-flex space-x-8 items-center">
-            <Link to="/">Home</Link>
-            <Link to="/about">About</Link>
+          <ul className="inline-flex space-x-8 text-white items-center">
+            <Link to="/" className=" "><span className="text-yellow-500 font-bold">H</span>ome</Link>
+            <Link to="/about"><span className="text-yellow-500 font-bold">A</span>bout</Link>
             <div className="dropdown">
-              <div tabIndex={0} role="button" className="btn m-1">
+              <div tabIndex={0} role="button" className="m-1 text-white py-2 px-4 bg-yellow-600 rounded-full font-bold ">
                 More Games
               </div>
               <ul
                 tabIndex={0}
-                className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                className="dropdown-content bg-gray-800 z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
               >
                 <li>
-                  <Link to="/games/rollrush">RollRush</Link>
+                  <Link className="bg-gray-700 mb-2"  to="/games/rollrush">Roll Rush</Link>
                 </li>
                 <li>
-                  <Link to="/games/diceup">Diceup</Link>
+                  <Link className="bg-gray-700" to="/games/diceup">Dice Up</Link>
                 </li>
               </ul>
             </div>
             {/* <Link to="/diceup">Diceup</Link> */}
           </ul>
         </div>
-        <div className="hidden lg:block">
-          <button type="button" className="h-auto ">
+        <div className="">
+          <button
+            onClick={btnhandler}
+            className="h-auto ml-4 bg-white text-black rounded-full  py-2 px-4"
+          >
+            {walletAddress}
+          </button>
+          <button type="button"
+          
+          >
             <CapsuleButton
               capsule={capsule}
               appName="RollRush"
               oAuthMethods={[OAuthMethod.GOOGLE]}
-            />{" "}
+            />{""}
             {/* Capsule Wallet */}
-          </button>
-          <button
-            onClick={btnhandler}
-            className="h-auto ml-4 bg-orange-500 rounded-lg py-3 px-2"
-          >
-            {walletAddress}
           </button>
         </div>
         <div className="lg:hidden">
@@ -192,7 +194,7 @@ function Navbar() {
                 </div>
                 <button
                   type="button"
-                  className="mt-4 w-full rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+                  className="mt-4 w-full rounded-full px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
                 >
                   Capsule
                 </button>

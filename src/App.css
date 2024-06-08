@@ -3,7 +3,7 @@
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #000000;
+  background-color: #ff2727;
   color: #ffffff;
   margin: 1em;
   cursor: pointer;
@@ -21,6 +21,8 @@ button:focus-visible {
   width: 280px;
   margin: 0 auto;
 }
+
+
 
 #root {
   max-width: 1000px;
