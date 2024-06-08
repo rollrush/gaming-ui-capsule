@@ -98,7 +98,7 @@ function Navbar() {
               </g>
             </svg>
           </span>
-          <span className="font-bold text-white text-2xl underline decoration-yellow-500 ">Roll Rush</span>
+          <span className="font-bold text-white text-2xl underline decoration-yellow-500 ">RollRush</span>
         </div>
         <div className="hidden lg:block">
           <ul className="inline-flex space-x-8 text-white items-center">
@@ -106,7 +106,7 @@ function Navbar() {
             <Link to="/about"><span className="text-yellow-500 font-bold">A</span>bout</Link>
             <div className="dropdown">
               <div tabIndex={0} role="button" className="m-1 text-white py-2 px-4 bg-yellow-600 rounded-full font-bold ">
-                More Games
+                Games
               </div>
               <ul
                 tabIndex={0}
