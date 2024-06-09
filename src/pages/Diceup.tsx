@@ -121,7 +121,6 @@ const Diceup = () => {
           </div>
           </div>
           <div className="card-body items-center text-center w-max">
-            <h2 className="card-title">Shoes!</h2>
             <div className="flex p-1 ">
               <div className="form-control">
                 <label className="label cursor-pointer">
