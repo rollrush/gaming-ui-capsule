@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import ReactDice, { ReactDiceRef } from "react-dice-complete";
 // import "react-dice-complete/dist/react-dice-complete.css";
+
 const Diceup = () => {
   const reactDice = useRef<ReactDiceRef>(null);
   const [selected, setSelected] = useState<number>(0);
@@ -81,9 +82,11 @@ const Diceup = () => {
           <p className="py-4">{modalText}</p>
         </div>
       </dialog>
-      <div className=" w-screen h-screen flex justify-center items-center flex-col">
-        <h1 className="text-2xl">{reward}</h1>
-        <div className="card  bg-base-100 shadow-xl w-max">
+      <div className=" w-screen h-screen bg-yellow-700 flex justify-center items-center flex-col">
+        <div className="bg-yellow-100 rounded-full px-3 py-1 text-black mb-2 ">
+        <h1 className="text-2xl font-cls2">Your Reward : {reward}</h1>
+        </div>
+        <div className="card bg-yellow-100  bg-base-100 shadow-xl w-max">
           <div className="flex justify-center">
             <input
               type="number"
@@ -100,33 +103,34 @@ const Diceup = () => {
                 return;
               }}
               placeholder="Make Bet"
-              className="input input-bordered w-full max-w-xs"
+              className="input border bg-transparent placeholder:text-yellow-600 border-yellow-600 rounded-full mt-8 w-[25vw] mb-4 px-4  "
             />
           </div>
           <div className="flex justify-center">
+          <div className="bg-yellow-800 w-[25vw] rounded-2xl flex justify-center">
             <ReactDice
               rollDone={afterRoll}
               numDice={2}
               rollTime={1}
               disableIndividual
               ref={reactDice}
-              faceColor="radial-gradient(rgb(255, 60, 60), rgb(180, 0, 0))"
+              faceColor="radial-gradient(circle, rgba(232, 133, 25, 1) 0%, rgba(255, 210, 68, 1) 100%)"
               dotColor="#fff"
               dieSize={90}
             />
           </div>
+          </div>
           <div className="card-body items-center text-center w-max">
-            <h2 className="card-title">Shoes!</h2>
-            <div className="flex p-3 ">
+            <div className="flex p-1 ">
               <div className="form-control">
                 <label className="label cursor-pointer">
-                  <span className="label-text font-bold text-lg">
+                  <span className="label-text text-yellow-800 font-bold mr-2 text-md">
                     Seven Down
                   </span>
                   <input
                     type="radio"
                     name="radio-10"
-                    className="radio checked:bg-red-500"
+                    className="radio bg-yellow-600 checked:bg-red-500"
                     checked={selected === 1}
                     onChange={() => setSelected(1)}
                   />
@@ -134,11 +138,11 @@ const Diceup = () => {
               </div>
               <div className="form-control">
                 <label className="label cursor-pointer">
-                  <span className="label-text font-bold text-lg">Seven</span>
+                  <span className="label-text text-yellow-800  font-bold mr-2 text-md">Seven</span>
                   <input
                     type="radio"
                     name="radio-10"
-                    className="radio checked:bg-green-500"
+                    className="radio bg-yellow-600 checked:bg-green-500"
                     checked={selected === 2}
                     onChange={() => setSelected(2)}
                   />
@@ -146,11 +150,11 @@ const Diceup = () => {
               </div>
               <div className="form-control">
                 <label className="label cursor-pointer">
-                  <span className="label-text font-bold text-lg">Seven Up</span>
+                  <span className="label-text text-yellow-800  font-bold mr-2 text-md">Seven Up</span>
                   <input
                     type="radio"
                     name="radio-10"
-                    className="radio checked:bg-blue-500"
+                    className="radio bg-yellow-600 checked:bg-yellow-600"
                     checked={selected === 3}
                     onChange={() => setSelected(3)}
                   />
@@ -160,7 +164,7 @@ const Diceup = () => {
             <div className="card-actions"></div>
           </div>
         </div>
-        <button onClick={rollDice} className="btn bg-orange-500 text-2xl mt-3">
+        <button onClick={rollDice} className="btn hover:bg-black bg-yellow-500 mb-10 text-white font-cls3 rounded-full text-2xl mt-3">
           Roll Dice
         </button>
       </div>

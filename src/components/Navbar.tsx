@@ -3,7 +3,7 @@ import { Menu, X } from "lucide-react";
 import Capsule, {
   CapsuleButton,
   Environment,
-  OAuthMethod,
+  OAuthMethod
 } from "@usecapsule/react-sdk";
 import { Link } from "react-router-dom";
 
@@ -112,11 +112,11 @@ function Navbar() {
                 tabIndex={0}
                 className="dropdown-content bg-gray-800 z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
               >
-                <li>
-                  <Link className="bg-gray-700 mb-2"  to="/games/rollrush">Roll Rush</Link>
+               <li>
+                  <Link className="bg-gray-700 text-yellow-600 mb-2 hover:text-white hover:bg-yellow-600"  to="/games/rollrush">Roll Rush</Link>
                 </li>
                 <li>
-                  <Link className="bg-gray-700" to="/games/diceup">Dice Up</Link>
+                  <Link className="bg-gray-700 text-yellow-600 hover:text-white hover:bg-yellow-600 active:text-red-500" to="/games/diceup">Dice Up</Link>
                 </li>
               </ul>
             </div>
