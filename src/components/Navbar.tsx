@@ -5,7 +5,7 @@ import Capsule, {
   Environment,
   OAuthMethod
 } from "@usecapsule/react-sdk";
-import { NavLink,Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 // not sensitive
 const BETA_KEY = "d0b61c2c8865aaa2fb12886651627271";
