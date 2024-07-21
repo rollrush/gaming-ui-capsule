@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
-import Capsule, {
-  CapsuleButton,
-  Environment,
-  OAuthMethod
-} from "@usecapsule/react-sdk";
+
+import Capsule, { Environment, CapsuleModal, OAuthMethod } from "@usecapsule/react-sdk";
+// Import styles if using v3.5.0 or greater of `@usecapsule/react-sdk`
+import "@usecapsule/react-sdk/styles.css";
 import { Link } from "react-router-dom";
 
 // not sensitive
-const BETA_KEY = "d0b61c2c8865aaa2fb12886651627271";
+const capsule = new Capsule(Environment.BETA, process.env.CAPSULE_API_KEY);
 const menuItems = [
   {
     name: "About",
@@ -26,8 +25,6 @@ const menuItems = [
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-
-  const capsule = new Capsule(Environment.DEVELOPMENT, BETA_KEY);
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -59,7 +56,6 @@ function Navbar() {
       alert("install metamask extension!!");
     }
   };
-
   return (
     <div className="relative w-full backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
@@ -130,16 +126,9 @@ function Navbar() {
           >
             {walletAddress}
           </button>
-          <button type="button"
-          
-          >
-            <CapsuleButton
-              capsule={capsule}
-              appName="RollRush"
-              oAuthMethods={[OAuthMethod.GOOGLE]}
-            />{""}
-            {/* Capsule Wallet */}
-          </button>
+          <button onClick={() => setIsMenuOpen(true)} className="mt-4 w-full rounded-full px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black">Capsule</button>
+
+      <CapsuleModal capsule={capsule} isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} appName="RollRush" oAuthMethods={[OAuthMethod.GOOGLE, OAuthMethod.TWITTER, OAuthMethod.DISCORD]} />
         </div>
         <div className="lg:hidden">
           <Menu onClick={toggleMenu} className="h-6 w-6 cursor-pointer" />
@@ -198,9 +187,6 @@ function Navbar() {
                 >
                   Capsule
                 </button>
-                {/* <button >
-                  Wallet
-                </button> */}
               </div>
             </div>
           </div>
