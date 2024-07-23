@@ -8,8 +8,7 @@ import Capsule, { Environment } from "@usecapsule/react-sdk";
 // Ensure you replace `process.env.CAPSULE_API_KEY` with your actual API key
 export const capsuleInstance = new Capsule(
   Environment.BETA,
-  // process.env.REACT_APP_CAPSULE_API_KEY
-  "05e8a986b231d9fc6cd87f1dbf5dd096"
+  process.env.REACT_APP_CAPSULE_API_KEY
 );
 
 const CapsuleContext = createContext(capsuleInstance);

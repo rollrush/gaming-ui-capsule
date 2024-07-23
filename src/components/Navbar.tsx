@@ -1,11 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Menu, X } from "lucide-react";
 
-import Capsule, {
-  Environment,
-  CapsuleModal,
-  OAuthMethod,
-} from "@usecapsule/react-sdk";
 // Import styles if using v3.5.0 or greater of `@usecapsule/react-sdk`
 import "@usecapsule/react-sdk/styles.css";
 import { Link } from "react-router-dom";

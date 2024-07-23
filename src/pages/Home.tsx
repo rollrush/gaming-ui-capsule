@@ -3,16 +3,13 @@ import { Link } from "react-router-dom";
 import { useWalletStore } from "../store/store";
 import "../App.css";
 
-import Capsule, { Environment } from "@usecapsule/react-sdk";
-import { useContext } from "react";
-import { CapsuleProvider, useCapsule } from "../context/CapsuleContext";
+import { useCapsule } from "../context/CapsuleContext";
 const Home = () => {
   const {
-    checkIfLoggedIn,
     toggleMenu,
-    walletAddress,
+
     isMenuOpen,
-    updateWalletAddress,
+
     // capsule,
   } = useWalletStore();
 
@@ -70,7 +67,7 @@ const Home = () => {
                 </div>
                 <ul
                   tabIndex={0}
-                  className="dropdown-content bg-gray-800 z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                  className="dropdown-content  z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
                 >
                   <li>
                     <Link
