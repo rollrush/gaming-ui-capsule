@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 
-import Capsule, { Environment, CapsuleModal, OAuthMethod } from "@usecapsule/react-sdk";
+import Capsule, {
+  Environment,
+  CapsuleModal,
+  OAuthMethod,
+} from "@usecapsule/react-sdk";
 // Import styles if using v3.5.0 or greater of `@usecapsule/react-sdk`
 import "@usecapsule/react-sdk/styles.css";
 import { Link } from "react-router-dom";
+import { useWalletStore } from "../store/store";
 
 // not sensitive
-const capsule = new Capsule(Environment.BETA, process.env.CAPSULE_API_KEY);
+
 const menuItems = [
   {
     name: "About",
@@ -24,22 +29,14 @@ const menuItems = [
 ];
 
 function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-  const [walletAddress, setWalletAddress] = useState<string | undefined>(
-    "Connect Wallet"
-  );
+  const {
+    checkIfLoggedIn,
+    toggleMenu,
+    walletAddress,
+    isMenuOpen,
+    updateWalletAddress,
+  } = useWalletStore();
 
-  async function checkIfLoggedIn(): Promise<void> {
-    if (await capsule.isFullyLoggedIn()) {
-      setWalletAddress(Object.values(capsule.getWallets())[0]?.address);
-      console.log(walletAddress);
-    } else {
-      setWalletAddress("Connect Wallet");
-    }
-  }
   useEffect(() => {
     checkIfLoggedIn();
     console.log(walletAddress, " this is wallet");
@@ -51,13 +48,25 @@ function Navbar() {
       // res[0] for fetching a first wallet
       (window as any).ethereum
         .request({ method: "eth_requestAccounts" })
-        .then((res: any) => setWalletAddress(res[0]));
+        .then((res: any) => updateWalletAddress(res[0]));
     } else {
       alert("install metamask extension!!");
     }
   };
   return (
-    <div className="relative w-full backdrop-blur-md">
+    <div className="relative w-full backdrop-blur-md h-max">
+      {/* <CapsuleModal
+        className=""
+        capsule={capsule}
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        appName="RollRush"
+        oAuthMethods={[
+          OAuthMethod.GOOGLE,
+          OAuthMethod.TWITTER,
+          OAuthMethod.DISCORD,
+        ]}
+      /> */}
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
         <div className="inline-flex items-center space-x-2">
           <span>
@@ -94,41 +103,64 @@ function Navbar() {
               </g>
             </svg>
           </span>
-          <span className="font-bold text-white text-2xl underline decoration-yellow-500 ">RollRush</span>
+          <span className="font-bold text-white text-2xl underline decoration-yellow-500 ">
+            RollRush
+          </span>
         </div>
         <div className="hidden lg:block">
           <ul className="inline-flex space-x-8 text-white items-center">
-            <Link to="/" className=" "><span className="text-yellow-500 font-bold">H</span>ome</Link>
-            <Link to="/about"><span className="text-yellow-500 font-bold">A</span>bout</Link>
+            <Link to="/" className=" ">
+              <span className="text-yellow-500 font-bold">H</span>ome
+            </Link>
+            <Link to="/about">
+              <span className="text-yellow-500 font-bold">A</span>bout
+            </Link>
             <div className="dropdown">
-              <div tabIndex={0} role="button" className="m-1 text-white py-2 px-4 bg-yellow-600 rounded-full font-bold ">
+              <div
+                tabIndex={0}
+                role="button"
+                className="m-1 text-white py-2 px-4 bg-yellow-600 rounded-full font-bold "
+              >
                 Games
               </div>
               <ul
                 tabIndex={0}
                 className="dropdown-content bg-gray-800 z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
               >
-               <li>
-                  <Link className="bg-gray-700 text-yellow-600 mb-2 hover:text-white hover:bg-yellow-600"  to="/games/rollrush">Roll Rush</Link>
+                <li>
+                  <Link
+                    className="bg-gray-700 text-yellow-600 mb-2 hover:text-white hover:bg-yellow-600"
+                    to="/games/rollrush"
+                  >
+                    Roll Rush
+                  </Link>
                 </li>
                 <li>
-                  <Link className="bg-gray-700 text-yellow-600 hover:text-white hover:bg-yellow-600 active:text-red-500" to="/games/diceup">Dice Up</Link>
+                  <Link
+                    className="bg-gray-700 text-yellow-600 hover:text-white hover:bg-yellow-600 active:text-red-500"
+                    to="/games/diceup"
+                  >
+                    Dice Up
+                  </Link>
                 </li>
               </ul>
             </div>
             {/* <Link to="/diceup">Diceup</Link> */}
           </ul>
         </div>
-        <div className="">
+        <div className=" ">
           <button
             onClick={btnhandler}
             className="h-auto ml-4 bg-white text-black rounded-full  py-2 px-4"
           >
             {walletAddress}
           </button>
-          <button onClick={() => setIsMenuOpen(true)} className="mt-4 w-full rounded-full px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black">Capsule</button>
-
-      <CapsuleModal capsule={capsule} isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} appName="RollRush" oAuthMethods={[OAuthMethod.GOOGLE, OAuthMethod.TWITTER, OAuthMethod.DISCORD]} />
+          <button
+            onClick={() => toggleMenu()}
+            className="mt-4 w-full rounded-full px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+          >
+            Capsule
+          </button>
         </div>
         <div className="lg:hidden">
           <Menu onClick={toggleMenu} className="h-6 w-6 cursor-pointer" />
