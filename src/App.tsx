@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Diceup from "./pages/Diceup";
 import Roulette from "./pages/Roulette";
+import CoinToss from "./pages/CoinToss";
 // import './style.css';
 
 function App() {
@@ -124,6 +125,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/games/rollrush" element={<Roulette />} />
         <Route path="/games/diceup" element={<Diceup />} />
+        <Route path="/games/coin" element={<CoinToss />} />
       </Routes>
       {showButton && (
         <button

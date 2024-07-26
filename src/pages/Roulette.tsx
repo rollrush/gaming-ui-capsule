@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-
+import "../style.css";
 const Roulette = () => {
   useEffect(() => {
     const script = document.createElement("script");
