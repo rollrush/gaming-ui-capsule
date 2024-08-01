@@ -11,18 +11,23 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-three/drei": "^9.109.2",
+    "@react-three/fiber": "^8.16.8",
     "@usecapsule/core-sdk": "^1.19.0",
     "@usecapsule/ethers-v6-integration": "1.3.0",
     "@usecapsule/react-sdk": "^3.17.0",
     "bootstrap": "^5.3.3",
     "ethers": "^5.7.2",
     "framer-motion": "^11.3.19",
+    "konva": "^9.3.14",
     "lucide-react": "^0.378.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.2",
     "react-dice-complete": "^2.2.0",
     "react-dom": "^18.2.0",
+    "react-konva": "^18.2.10",
     "react-router-dom": "^6.23.1",
+    "three": "^0.167.0",
     "zustand": "^4.5.4"
   },
   "devDependencies": {
