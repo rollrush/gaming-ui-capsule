@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { Stage, Layer, Circle } from "react-konva";
+import { Stage, Layer, Group } from "react-konva";
+
+import MagneticBead from "../components/MagneticBead";
 
 interface Bead {
   id: number;
@@ -31,7 +33,6 @@ const CanvasBoard: React.FC = () => {
       strength: 3,
       threshold: 0.08,
     },
-
     {
       id: 3,
       x: 200,
@@ -62,10 +63,36 @@ const CanvasBoard: React.FC = () => {
       threshold: 0.08,
     },
   ]);
+  const stageWidth = 800; // Width of the stage
+  const stageHeight = 600; // Height of the stage
+  // const handleDragEnd = (e: any, index: number) => {
+  //   const { x, y } = e.target.position();
+  //   let newBeads = [...beads];
+  //   newBeads[index] = { ...newBeads[index], x, y };
 
+  //   });
+
+  //   setBeads(newBeads);
+  // };
   const handleDragEnd = (e: any, index: number) => {
-    const { x, y } = e.target.position();
+    let { x, y } = e.target.position();
+    const bead = beads[index];
+
+    // Boundary checks
+    if (x - bead.radius < 5) {
+      x = bead.radius;
+    } else if (x + bead.radius > stageWidth) {
+      x = stageWidth - bead.radius;
+    }
+
+    if (y - bead.radius < 5) {
+      y = bead.radius;
+    } else if (y + bead.radius > stageHeight) {
+      y = stageHeight - bead.radius;
+    }
+
     let newBeads = [...beads];
+    newBeads[index] = { ...newBeads[index], x, y };
     newBeads[index] = { ...newBeads[index], x, y };
 
     newBeads.forEach((bead, i) => {
@@ -75,12 +102,34 @@ const CanvasBoard: React.FC = () => {
           const position = calculateAttachPosition(newBeads[index], bead);
           newBeads[i] = { ...bead, x: position.x, y: position.y };
         }
+        let overlapDetected = false;
+        for (let j = 0; j < newBeads.length; j++) {
+          if (i !== j) {
+            const distance = calculateDistance(newBeads[i], newBeads[j]);
+            if (distance < newBeads[i].radius + newBeads[j].radius) {
+              const position = calculateAttachPosition(
+                newBeads[i],
+                newBeads[j]
+              );
+              newBeads[j] = { ...newBeads[j], x: position.x, y: position.y };
+              overlapDetected = true;
+            }
+          }
+        }
+        if (overlapDetected) {
+          const distance = calculateDistance(newBeads[index], newBeads[i]);
+          if (distance < newBeads[index].radius + newBeads[i].radius) {
+            const position = calculateAttachPosition(
+              newBeads[index],
+              newBeads[i]
+            );
+            newBeads[i] = { ...newBeads[i], x: position.x, y: position.y };
+          }
+        }
       }
     });
-
     setBeads(newBeads);
   };
-
   const calculateDistance = (bead1: Bead, bead2: Bead): number => {
     const dx = bead1.x - bead2.x;
     const dy = bead1.y - bead2.y;
@@ -104,21 +153,28 @@ const CanvasBoard: React.FC = () => {
   };
 
   return (
-    <Stage width={800} height={600}>
-      <Layer>
-        {beads.map((bead, index) => (
-          <Circle
-            key={bead.id}
-            x={bead.x}
-            y={bead.y}
-            radius={bead.radius}
-            fill={bead.color}
-            draggable
-            onDragEnd={(e) => handleDragEnd(e, index)}
-          />
-        ))}
-      </Layer>
-    </Stage>
+    <div className="h-max w-screen flex justify-center items-center">
+      <div className="bg-white border-2 border-slate-500 w-max ">
+        <Stage
+          width={800}
+          height={600}
+          className="border-2 border-black border-solid"
+        >
+          <Layer>
+            <Group>
+              {beads.map((bead, index) => (
+                <MagneticBead
+                  bead={bead}
+                  handleDragEnd={handleDragEnd}
+                  index={index}
+                  key={bead.id}
+                />
+              ))}
+            </Group>
+          </Layer>
+        </Stage>
+      </div>
+    </div>
   );
 };
 

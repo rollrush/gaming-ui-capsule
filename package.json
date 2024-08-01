@@ -26,6 +26,7 @@
     "react-dice-complete": "^2.2.0",
     "react-dom": "^18.2.0",
     "react-konva": "^18.2.10",
+    "react-konva-utils": "^1.0.6",
     "react-router-dom": "^6.23.1",
     "three": "^0.167.0",
     "zustand": "^4.5.4"

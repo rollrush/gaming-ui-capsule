@@ -3703,7 +3703,15 @@ react-is@^16.13.1, react-is@^16.3.2:
   resolved "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
-react-konva@^18.2.10:
+react-konva-utils@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/react-konva-utils/-/react-konva-utils-1.0.6.tgz#7cda4a9ea94665f6b30813a4c1eaf600b89b4c84"
+  integrity sha512-011+jyXwadFDkbIUdlTarKwbqME0ljX1vPeW5oyLQx4rtHdcsDr43tdOdSsMT3XpZyl8clgM9I/eK0lBuBuFHg==
+  dependencies:
+    react-konva "^18.0.0-0"
+    use-image "^1.1.0"
+
+react-konva@^18.0.0-0, react-konva@^18.2.10:
   version "18.2.10"
   resolved "https://registry.yarnpkg.com/react-konva/-/react-konva-18.2.10.tgz#5b5edc5e9ed452755d21babc353747828868decc"
   integrity sha512-ohcX1BJINL43m4ynjZ24MxFI1syjBdrXhqVxYVDw2rKgr3yuS0x/6m1Y2Z4sl4T/gKhfreBx8KHisd0XC6OT1g==
@@ -4360,6 +4368,11 @@ url@^0.11.0:
   dependencies:
     punycode "^1.4.1"
     qs "^6.11.2"
+
+use-image@^1.1.0:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/use-image/-/use-image-1.1.1.tgz#bdd3f2e1718393ffc0e56136f993467103d9d2df"
+  integrity sha512-n4YO2k8AJG/BcDtxmBx8Aa+47kxY5m335dJiCQA5tTeVU4XdhrhqR6wT0WISRXwdMEOv5CSjqekDZkEMiiWaYQ==
 
 use-sync-external-store@1.2.0:
   version "1.2.0"
