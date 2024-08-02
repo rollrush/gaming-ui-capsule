@@ -1,3 +1,4 @@
+import Konva from "konva";
 import React, { useState } from "react";
 import { Circle } from "react-konva";
 import { Portal } from "react-konva-utils";

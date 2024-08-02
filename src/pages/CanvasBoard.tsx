@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Stage, Layer, Group } from "react-konva";
-
 import MagneticBead from "../components/MagneticBead";
+import { Howl } from "howler";
 
+const attachSound = new Howl({
+  src: [""], // Correct path to your sound file in the public directory
+});
+// import sound from "./rattingmag.mp3";
 interface Bead {
   id: number;
   x: number;
@@ -65,15 +69,7 @@ const CanvasBoard: React.FC = () => {
   ]);
   const stageWidth = 800; // Width of the stage
   const stageHeight = 600; // Height of the stage
-  // const handleDragEnd = (e: any, index: number) => {
-  //   const { x, y } = e.target.position();
-  //   let newBeads = [...beads];
-  //   newBeads[index] = { ...newBeads[index], x, y };
 
-  //   });
-
-  //   setBeads(newBeads);
-  // };
   const handleDragEnd = (e: any, index: number) => {
     let { x, y } = e.target.position();
     const bead = beads[index];
@@ -92,7 +88,6 @@ const CanvasBoard: React.FC = () => {
     }
 
     let newBeads = [...beads];
-    newBeads[index] = { ...newBeads[index], x, y };
     newBeads[index] = { ...newBeads[index], x, y };
 
     newBeads.forEach((bead, i) => {
@@ -129,13 +124,51 @@ const CanvasBoard: React.FC = () => {
       }
     });
     setBeads(newBeads);
+    const attachedBeadIds = getAttachedBeads(newBeads, index);
+    console.log("playing sounds");
+    // attachSound();
+
+    if (attachedBeadIds.length >= 2) {
+      // Play attach sound effect
+
+      // Animate and remove beads
+      attachedBeadIds.forEach((beadId) => {
+        const attachedBead = e.target;
+        if (attachedBead) {
+          attachedBead.to({
+            scaleX: 0,
+            scaleY: 0,
+            opacity: 0,
+            duration: 0.3,
+            onFinish: () => {
+              newBeads = newBeads.filter(
+                (bead) => !attachedBeadIds.includes(bead.id)
+              );
+              setBeads(newBeads);
+            },
+          });
+        }
+      });
+    }
+    // console.log(a, "attached beads");
+    console.log(beads, "this is beads");
   };
   const calculateDistance = (bead1: Bead, bead2: Bead): number => {
     const dx = bead1.x - bead2.x;
     const dy = bead1.y - bead2.y;
     return Math.sqrt(dx * dx + dy * dy);
   };
+  // useEffect(() => {
+  //   // Handle sound load error
+  //   attachSound.on("loaderror", (id, error) => {
+  //     console.error("Error loading sound:", error);
+  //   });
 
+  //   // Log when the sound is loaded
+  //   attachSound.on("load", () => {
+  //     console.log("Sound loaded successfully");
+  //   });
+  // }, []);
   const calculateAttachPosition = (
     bead1: Bead,
     bead2: Bead
@@ -151,14 +184,54 @@ const CanvasBoard: React.FC = () => {
       y: bead1.y - offsetY,
     };
   };
+  const getAttachedBeads = (beads: Bead[], index: number): number[] => {
+    const attachedBeads: number[] = [];
+    const stack: number[] = [index];
+    const visited: boolean[] = Array(beads.length).fill(false);
+
+    while (stack.length > 0) {
+      const currentIndex = stack.pop();
+      if (currentIndex === undefined || visited[currentIndex]) continue;
+
+      visited[currentIndex] = true;
+      attachedBeads.push(beads[currentIndex].id);
+
+      beads.forEach((bead, i) => {
+        if (
+          !visited[i] &&
+          calculateDistance(beads[currentIndex], bead) <
+            (beads[currentIndex].radius + bead.radius) * 2
+        ) {
+          stack.push(i);
+        }
+      });
+    }
+
+    // setBeads(newBeads);
+    // setBeads(newBeads);
+
+    return attachedBeads;
+  };
+
+  useEffect(() => {
+    // Handle sound load error
+    attachSound.on("loaderror", (id, error) => {
+      console.error("Error loading sound:", error);
+    });
+
+    // Log when the sound is loaded
+    attachSound.on("load", () => {
+      console.log("Sound loaded successfully");
+    });
+  }, []);
 
   return (
     <div className="h-max w-screen flex justify-center items-center">
-      <div className="bg-white border-2 border-slate-500 w-max ">
+      <div className="border-2 border-slate-500 w-max rounded-2xl p-10 bg-orange-300 ">
         <Stage
           width={800}
           height={600}
-          className="border-2 border-black border-solid"
+          className="border-2 border-black border-solid rounded-2xl bg-white"
         >
           <Layer>
             <Group>

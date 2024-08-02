@@ -19,6 +19,7 @@
     "bootstrap": "^5.3.3",
     "ethers": "^5.7.2",
     "framer-motion": "^11.3.19",
+    "howler": "^2.2.4",
     "konva": "^9.3.14",
     "lucide-react": "^0.378.0",
     "react": "^18.2.0",
@@ -29,9 +30,11 @@
     "react-konva-utils": "^1.0.6",
     "react-router-dom": "^6.23.1",
     "three": "^0.167.0",
+    "use-sound": "^4.0.3",
     "zustand": "^4.5.4"
   },
   "devDependencies": {
+    "@types/howler": "^2.2.11",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
