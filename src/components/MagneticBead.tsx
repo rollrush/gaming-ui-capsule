@@ -1,7 +1,7 @@
-import Konva from "konva";
 import React, { useState } from "react";
 import { Circle } from "react-konva";
 import { Portal } from "react-konva-utils";
+
 interface Bead {
   id: number;
   x: number;
@@ -14,18 +14,16 @@ interface Bead {
 
 interface ScalableCircleProps {
   bead: Bead;
-  index: number;
-  handleDragEnd: (e: any, index: number) => void;
+  handleDragEnd: (e: any, id: number) => void;
 }
 
 const MagneticBead: React.FC<ScalableCircleProps> = ({
   bead,
-  index,
   handleDragEnd,
 }) => {
   const [isHeld, setIsHeld] = useState(false);
-  let stageWidth = 800;
-  let stageHeight = 600;
+  // let stageWidth = 800;
+  // let stageHeight = 600;
 
   return (
     <Portal selector=".top-layer" enabled={isHeld}>
@@ -51,30 +49,30 @@ const MagneticBead: React.FC<ScalableCircleProps> = ({
         onMouseUp={() => setIsHeld(false)}
         onDragEnd={(e) => {
           setIsHeld(false);
-          handleDragEnd(e, index);
+          handleDragEnd(e, bead.id);
         }}
         onMouseOut={() => setIsHeld(false)}
-        dragBoundFunc={(pos) => {
-          let newX = pos.x;
-          let newY = pos.y;
+        // dragBoundFunc={(pos) => {
+        //   let newX = pos.x;
+        //   let newY = pos.y;
 
-          if (newX - bead.radius < 0) {
-            newX = bead.radius;
-          } else if (newX + bead.radius > stageWidth) {
-            newX = stageWidth - bead.radius;
-          }
+        //   if (newX - bead.radius < 0) {
+        //     newX = bead.radius;
+        //   } else if (newX + bead.radius > stageWidth) {
+        //     newX = stageWidth - bead.radius;
+        //   }
 
-          if (newY - bead.radius < 0) {
-            newY = bead.radius;
-          } else if (newY + bead.radius > stageHeight) {
-            newY = stageHeight - bead.radius;
-          }
+        //   if (newY - bead.radius < 0) {
+        //     newY = bead.radius;
+        //   } else if (newY + bead.radius > stageHeight) {
+        //     newY = stageHeight - bead.radius;
+        //   }
 
-          return {
-            x: newX,
-            y: newY,
-          };
-        }}
+        //   return {
+        //     x: newX,
+        //     y: newY,
+        //   };
+        // }}
       />
     </Portal>
   );

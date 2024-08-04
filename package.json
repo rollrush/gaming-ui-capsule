@@ -13,6 +13,7 @@
   "dependencies": {
     "@react-three/drei": "^9.109.2",
     "@react-three/fiber": "^8.16.8",
+    "@types/three": "^0.167.1",
     "@usecapsule/core-sdk": "^1.19.0",
     "@usecapsule/ethers-v6-integration": "1.3.0",
     "@usecapsule/react-sdk": "^3.17.0",
@@ -29,7 +30,7 @@
     "react-konva": "^18.2.10",
     "react-konva-utils": "^1.0.6",
     "react-router-dom": "^6.23.1",
-    "three": "^0.167.0",
+    "three": "^0.167.1",
     "use-sound": "^4.0.3",
     "zustand": "^4.5.4"
   },
