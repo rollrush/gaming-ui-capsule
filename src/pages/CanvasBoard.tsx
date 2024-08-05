@@ -1,16 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Stage, Layer, Group, Rect } from "react-konva";
 import MagneticBead from "../components/MagneticBead";
-import { Howl } from "howler";
-
-const attachSound = new Howl({
-  src: [""], // Correct path to your sound file in the public directory
-});
-
-const stageWidth = 800; // Width of the stage
-const stageHeight = 600; // Height of the stage
-const mainBoardLeft = 130;
-const mainBoardRight = stageWidth - 130;
+import { log } from "three/webgpu";
 
 interface Bead {
   id: number;
@@ -23,6 +14,8 @@ interface Bead {
 }
 
 const CanvasBoard: React.FC = () => {
+  const stageWidth = 800;
+  const stageHeight = 600;
   const [player1beads, setPlayer1Beads] = useState<Bead[]>([
     {
       id: 1,
@@ -119,186 +112,96 @@ const CanvasBoard: React.FC = () => {
   ]);
   const [onBoardBeads, setOnBoardBeads] = useState<Bead[]>([]);
 
-  const handleDragEnd = (
-    e: any,
-    beadId: number,
-    beads: Bead[],
-    setBeads: React.Dispatch<React.SetStateAction<Bead[]>>
-  ) => {
-    let { x, y } = e.target.position();
-    const beadIndex = beads.findIndex((bead) => bead.id === beadId);
-    const bead = beads[beadIndex];
-    console.log("Bead: ", bead, "Bead Index: ", beadIndex);
+  const mainBoardLeft = 100;
+  const mainBoardRight = 700;
 
-    if (!bead) return;
-
-    // Boundary checks
-    if (x - bead.radius < 5) {
-      x = bead.radius;
-    } else if (x + bead.radius > stageWidth) {
-      x = stageWidth - bead.radius;
-    }
-
-    if (y - bead.radius < 5) {
-      y = bead.radius;
-    } else if (y + bead.radius > stageHeight) {
-      y = stageHeight - bead.radius;
-    }
-    console.log(
-      "X: ",
-      x,
-      "Y: ",
-      y,
-      "formthe function",
-      mainBoardLeft,
-      mainBoardRight
-    );
-
-    // Check if the bead is placed within the main board area
-    if (x >= mainBoardLeft && x <= mainBoardRight) {
-      let newBeads = [...beads];
-      setOnBoardBeads([...onBoardBeads, bead]);
-      setBeads(newBeads.filter((b) => b.id !== beadId));
-      console.log("condition satisies bead inside the board", newBeads);
-      console.log(
-        "condition satisies bead inside the board",
-        onBoardBeads,
-        "this is the on board beads",
-        beads,
-        "thisis playe"
-      );
-      // newBeads[beadIndex] = { ...bead, x, y };
-
-      // // Adding bead to the main board
-      // let newOnBoardBeads = [...onBoardBeads, newBeads[beadIndex]];
-      // console.log("newOnBoardBeads", newOnBoardBeads);
-
-      // // Handling attachment of beads
-      // newOnBoardBeads.forEach((bead, i) => {
-      //   if (i !== beadIndex) {
-      //     const distance = calculateDistance(newOnBoardBeads[beadIndex], bead);
-      //     if (
-      //       distance <
-      //       (newOnBoardBeads[beadIndex].radius + bead.radius) * 2
-      //     ) {
-      //       const position = calculateAttachPosition(
-      //         newOnBoardBeads[beadIndex],
-      //         bead
-      //       );
-      //       newOnBoardBeads[i] = { ...bead, x: position.x, y: position.y };
-      //     }
-      //   }
-      // });
-
-      // setOnBoardBeads(newOnBoardBeads);
-
-      // const attachedBeadIds = getAttachedBeads(newOnBoardBeads, beadIndex);
-      // if (attachedBeadIds.length >= 2) {
-      //   attachedBeadIds.forEach((id) => {
-      //     const attachedBead = e.target;
-      //     if (attachedBead) {
-      //       attachedBead.to({
-      //         scaleX: 0,
-      //         scaleY: 0,
-      //         opacity: 0,
-      //         duration: 0.3,
-      //         onFinish: () => {
-      //           newOnBoardBeads = newOnBoardBeads.filter(
-      //             (bead) => !attachedBeadIds.includes(bead.id)
-      //           );
-      //           setOnBoardBeads(newOnBoardBeads);
-      //         },
-      //       });
-      //     }
-      //   });
-      // }
-
-      // Remove the bead from the player's collection
-      newBeads = newBeads.filter((b) => b.id !== beadId);
-      setBeads(newBeads);
-
-      // Add the bead to the main board
-      setOnBoardBeads([...onBoardBeads, bead]);
-    } else {
-      // If the bead is not placed within the main board area, reset its position
-      e.target.position({ x: bead.x, y: bead.y });
-    }
-
-    console.log("Player 1 Beads: ", player1beads);
-    console.log("Player 2 Beads: ", player2beads);
-    console.log("On Board Beads: ", onBoardBeads);
-  };
-
-  // const calculateDistance = (bead1: Bead, bead2: Bead): number => {
-  //   if (!bead1 || !bead2) return Infinity;
-  //   const dx = bead1.x - bead2.x;
-  //   const dy = bead1.y - bead2.y;
-  //   return Math.sqrt(dx * dx + dy * dy);
-  // };
-
-  // const calculateAttachPosition = (
-  //   bead1: Bead,
-  //   bead2: Bead
-  // ): { x: number; y: number } => {
-  //   const dx = bead1.x - bead2.x;
-  //   const dy = bead1.y - bead2.y;
-  //   const angle = Math.atan2(dy, dx);
-  //   const offsetX = Math.cos(angle) * (bead1.radius + bead2.radius);
-  //   const offsetY = Math.sin(angle) * (bead1.radius + bead2.radius);
-
-  //   return {
-  //     x: bead1.x - offsetX,
-  //     y: bead1.y - offsetY,
-  //   };
-  // };
-
-  // const getAttachedBeads = (beads: Bead[], index: number): number[] => {
-  //   const attachedBeads: number[] = [];
-  //   const stack: number[] = [index];
-  //   const visited: boolean[] = Array(beads.length).fill(false);
-
-  //   while (stack.length > 0) {
-  //     const currentIndex = stack.pop();
-  //     if (currentIndex === undefined || visited[currentIndex]) continue;
-
-  //     visited[currentIndex] = true;
-  //     attachedBeads.push(beads[currentIndex].id);
-
-  //     beads.forEach((bead, i) => {
-  //       if (
-  //         !visited[i] &&
-  //         calculateDistance(beads[currentIndex], bead) <
-  //           (beads[currentIndex].radius + bead.radius) * 2
-  //       ) {
-  //         stack.push(i);
-  //       }
-  //     });
-  //   }
-
-  //   return attachedBeads;
-  // };
+  const player1BeadsRef = useRef(player1beads);
+  const player2BeadsRef = useRef(player2beads);
+  const onBoardBeadsRef = useRef(onBoardBeads);
 
   useEffect(() => {
-    attachSound.on("loaderror", (error) => {
-      console.error("Error loading sound:", error);
-    });
+    player1BeadsRef.current = player1beads;
+    player2BeadsRef.current = player2beads;
+    onBoardBeadsRef.current = onBoardBeads;
+  }, [player1beads, player2beads, onBoardBeads]);
 
-    attachSound.on("load", () => {
-      console.log("Sound loaded successfully");
-    });
-  }, []);
+  const handleDragMove = useCallback(
+    (
+      e: any,
+      beadId: number,
+      beads: Bead[],
+      setBeads: React.Dispatch<React.SetStateAction<Bead[]>>
+    ) => {
+      const { x, y } = e.target.position();
+      setBeads((prevBeads) =>
+        prevBeads.map((bead) => (bead.id === beadId ? { ...bead, x, y } : bead))
+      );
+    },
+    []
+  );
+
+  const handleDragEnd = useCallback(
+    (e: any, beadId: number, isPlayer1: boolean, isPlayer2: boolean) => {
+      const { x, y } = e.target.position();
+      console.log("Drag end:", beadId, x, y, isPlayer1, isPlayer2);
+
+      if (x > mainBoardLeft && x < mainBoardRight) {
+        let playerBeads: Bead[];
+        let setPlayerBeads: React.Dispatch<React.SetStateAction<Bead[]>>;
+
+        if (isPlayer1) {
+          playerBeads = player1BeadsRef.current;
+          setPlayerBeads = setPlayer1Beads;
+        } else if (isPlayer2) {
+          playerBeads = player2BeadsRef.current;
+          setPlayerBeads = setPlayer2Beads;
+        } else {
+          // The bead is already on the board, just update its position
+          setOnBoardBeads((prevBeads) =>
+            prevBeads.map((bead) =>
+              bead.id === beadId ? { ...bead, x, y } : bead
+            )
+          );
+          return;
+        }
+
+        const movedBead = playerBeads.find((bead) => bead.id === beadId);
+        if (
+          movedBead &&
+          !onBoardBeadsRef.current.some((bead) => bead.id === beadId)
+        ) {
+          setPlayerBeads((prevBeads) =>
+            prevBeads.filter((bead) => bead.id !== beadId)
+          );
+          setOnBoardBeads((prevBeads) => [
+            ...prevBeads,
+            { ...movedBead, x, y },
+          ]);
+        }
+      } else {
+        console.log("out of bounds");
+      }
+    },
+    [mainBoardLeft, mainBoardRight]
+  );
+
+  useEffect(() => {
+    console.log("player1", player1beads);
+    console.log("player2", player2beads);
+    console.log("onboard", onBoardBeads);
+  }, [player1beads, player2beads, onBoardBeads]);
 
   return (
     <div className="h-max w-screen flex justify-center items-center">
       <div
-        className="border-2 border-slate-500 w-max rounded-2xl p-10 "
+        className="border-2 border-slate-500 w-max rounded-2xl p-10"
         style={{
           backgroundColor: "#617b5b",
         }}
       >
         <Stage
-          width={800}
-          height={600}
+          width={stageWidth}
+          height={stageHeight}
           className="border-2 border-black border-solid rounded-2xl bg-white"
         >
           <Layer>
@@ -306,16 +209,17 @@ const CanvasBoard: React.FC = () => {
               <Rect
                 x={0}
                 y={0}
-                width={130}
-                height={600}
+                width={mainBoardLeft}
+                height={stageHeight}
                 fill="rgba(0,0,255,0.1)"
               />
               {player1beads.map((bead) => (
                 <MagneticBead
                   bead={bead}
-                  handleDragEnd={(e) =>
-                    handleDragEnd(e, bead.id, player1beads, setPlayer1Beads)
+                  handleDragMove={(e) =>
+                    handleDragMove(e, bead.id, player1beads, setPlayer1Beads)
                   }
+                  handleDragEnd={(e) => handleDragEnd(e, bead.id, true, false)}
                   key={bead.id}
                 />
               ))}
@@ -324,18 +228,19 @@ const CanvasBoard: React.FC = () => {
           <Layer>
             <Group>
               <Rect
-                x={800 - 130}
+                x={mainBoardRight}
                 y={0}
-                width={130}
-                height={600}
+                width={stageWidth - mainBoardRight}
+                height={stageHeight}
                 fill="rgba(0,0,255,0.1)"
               />
               {player2beads.map((bead) => (
                 <MagneticBead
                   bead={bead}
-                  handleDragEnd={(e) =>
-                    handleDragEnd(e, bead.id, player2beads, setPlayer2Beads)
+                  handleDragMove={(e) =>
+                    handleDragMove(e, bead.id, player2beads, setPlayer2Beads)
                   }
+                  handleDragEnd={(e) => handleDragEnd(e, bead.id, false, true)}
                   key={bead.id}
                 />
               ))}
@@ -345,9 +250,10 @@ const CanvasBoard: React.FC = () => {
             {onBoardBeads.map((bead) => (
               <MagneticBead
                 bead={bead}
-                handleDragEnd={(e) =>
-                  handleDragEnd(e, bead.id, onBoardBeads, setOnBoardBeads)
+                handleDragMove={(e) =>
+                  handleDragMove(e, bead.id, onBoardBeads, setOnBoardBeads)
                 }
+                handleDragEnd={(e) => handleDragEnd(e, bead.id, false, false)}
                 key={bead.id}
               />
             ))}
