@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Stage, Layer, Group, Rect } from "react-konva";
 import MagneticBead from "../components/MagneticBead";
-import { log } from "three/webgpu";
 
 interface Bead {
   id: number;
@@ -129,10 +128,11 @@ const CanvasBoard: React.FC = () => {
     (
       e: any,
       beadId: number,
-      beads: Bead[],
+
       setBeads: React.Dispatch<React.SetStateAction<Bead[]>>
     ) => {
       const { x, y } = e.target.position();
+
       setBeads((prevBeads) =>
         prevBeads.map((bead) => (bead.id === beadId ? { ...bead, x, y } : bead))
       );
@@ -184,12 +184,101 @@ const CanvasBoard: React.FC = () => {
     },
     [mainBoardLeft, mainBoardRight]
   );
+  const calculateDistance = (bead1: Bead, bead2: Bead): number => {
+    const dx = bead1.x - bead2.x;
+    const dy = bead1.y - bead2.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+  // useEffect(() => {
+  //   // Handle sound load error
+  //   attachSound.on("loaderror", (id, error) => {
+  //     console.error("Error loading sound:", error);
+  //   });
+
+  //   // Log when the sound is loaded
+  //   attachSound.on("load", () => {
+  //     console.log("Sound loaded successfully");
+  //   });
+  // }, []);
+  const calculateAttachPosition = (
+    bead1: Bead,
+    bead2: Bead
+  ): { x: number; y: number } => {
+    const dx = bead1.x - bead2.x;
+    const dy = bead1.y - bead2.y;
+    const angle = Math.atan2(dy, dx);
+    const offsetX = Math.cos(angle) * (bead1.radius + bead2.radius);
+    const offsetY = Math.sin(angle) * (bead1.radius + bead2.radius);
+
+    return {
+      x: bead1.x - offsetX,
+      y: bead1.y - offsetY,
+    };
+  };
+  const getAttachedBeads = (beads: Bead[], index: number): number[] => {
+    const attachedBeads: number[] = [];
+    const stack: number[] = [index];
+    const visited: boolean[] = Array(beads.length).fill(false);
+
+    while (stack.length > 0) {
+      const currentIndex = stack.pop();
+      if (currentIndex === undefined || visited[currentIndex]) continue;
+
+      visited[currentIndex] = true;
+      attachedBeads.push(beads[currentIndex].id);
+
+      beads.forEach((bead, i) => {
+        if (
+          !visited[i] &&
+          calculateDistance(beads[currentIndex], bead) <
+            (beads[currentIndex].radius + bead.radius) * 2
+        ) {
+          stack.push(i);
+        }
+      });
+    }
+
+    // setBeads(newBeads);
+    // setBeads(newBeads);
+
+    return attachedBeads;
+  };
 
   useEffect(() => {
-    console.log("player1", player1beads);
-    console.log("player2", player2beads);
-    console.log("onboard", onBoardBeads);
-  }, [player1beads, player2beads, onBoardBeads]);
+    const checkBeadAttractions = () => {
+      let newBeads = [...onBoardBeads];
+      let hasChanges = false;
+
+      for (let i = 0; i < newBeads.length; i++) {
+        for (let j = i + 1; j < newBeads.length; j++) {
+          const distance = calculateDistance(newBeads[i], newBeads[j]);
+          if (distance < (newBeads[i].radius + newBeads[j].radius) * 2) {
+            const position = calculateAttachPosition(newBeads[i], newBeads[j]);
+            newBeads[j] = { ...newBeads[j], x: position.x, y: position.y };
+            hasChanges = true;
+          }
+        }
+      }
+
+      if (hasChanges) {
+        // Check for groups of 3 or more
+        for (let i = 0; i < newBeads.length; i++) {
+          const attachedBeadIds = getAttachedBeads(newBeads, i);
+          if (attachedBeadIds.length >= 2) {
+            newBeads = newBeads.filter(
+              (bead) => !attachedBeadIds.includes(bead.id)
+            );
+            console.log("Group of 3 or more beads removed:", attachedBeadIds);
+
+            break;
+          }
+        }
+        setOnBoardBeads(newBeads);
+      }
+    };
+
+    checkBeadAttractions();
+  }, [onBoardBeads]);
 
   return (
     <div className="h-max w-screen flex justify-center items-center">
@@ -217,7 +306,7 @@ const CanvasBoard: React.FC = () => {
                 <MagneticBead
                   bead={bead}
                   handleDragMove={(e) =>
-                    handleDragMove(e, bead.id, player1beads, setPlayer1Beads)
+                    handleDragMove(e, bead.id, setPlayer1Beads)
                   }
                   handleDragEnd={(e) => handleDragEnd(e, bead.id, true, false)}
                   key={bead.id}
@@ -238,7 +327,7 @@ const CanvasBoard: React.FC = () => {
                 <MagneticBead
                   bead={bead}
                   handleDragMove={(e) =>
-                    handleDragMove(e, bead.id, player2beads, setPlayer2Beads)
+                    handleDragMove(e, bead.id, setPlayer2Beads)
                   }
                   handleDragEnd={(e) => handleDragEnd(e, bead.id, false, true)}
                   key={bead.id}
@@ -251,7 +340,7 @@ const CanvasBoard: React.FC = () => {
               <MagneticBead
                 bead={bead}
                 handleDragMove={(e) =>
-                  handleDragMove(e, bead.id, onBoardBeads, setOnBoardBeads)
+                  handleDragMove(e, bead.id, setOnBoardBeads)
                 }
                 handleDragEnd={(e) => handleDragEnd(e, bead.id, false, false)}
                 key={bead.id}
