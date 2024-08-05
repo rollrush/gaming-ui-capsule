@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Stage, Layer, Group, Rect } from "react-konva";
-import MagneticBead from "../components/MagneticBead";
+import { Stage, Layer, Group, Rect, Text } from "react-konva";
+import { MagneticBead, OnBoardMagneticBead } from "../components/MagneticBead";
 
 interface Bead {
   id: number;
@@ -113,17 +113,39 @@ const CanvasBoard: React.FC = () => {
 
   const mainBoardLeft = 100;
   const mainBoardRight = 700;
+  // const getPlayerCollectionCoordinates = (isPlayer1: boolean) => {
+  //   if (isPlayer1) {
+  //     return [
+  //       { x: 30, y: 190 },
+  //       { x: 30, y: 250 },
+  //       { x: 30, y: 310 },
+  //     ];
+  //   } else {
+  //     return [
+  //       { x: 770, y: 190 },
+  //       { x: 770, y: 250 },
+  //       { x: 770, y: 310 },
+  //     ];
+  //   }
+  // };
 
   const player1BeadsRef = useRef(player1beads);
   const player2BeadsRef = useRef(player2beads);
   const onBoardBeadsRef = useRef(onBoardBeads);
-
+  const [_removingBeads, setRemovingBeads] = useState<Set<number>>(new Set());
+  const [currentPlayer, setCurrentPlayer] = useState(1);
+  const [player1Points, _setPlayer1Points] = useState(10);
+  const [player2Points, _setPlayer2Points] = useState(10);
+  const [_layer1attract, setPlayer1Attract] = useState(0);
+  const [_player2attract, setPlayer2Attract] = useState(0);
   useEffect(() => {
     player1BeadsRef.current = player1beads;
     player2BeadsRef.current = player2beads;
     onBoardBeadsRef.current = onBoardBeads;
   }, [player1beads, player2beads, onBoardBeads]);
-
+  const switchPlayer = () => {
+    setCurrentPlayer((prevPlayer) => (prevPlayer === 1 ? 2 : 1));
+  };
   const handleDragMove = useCallback(
     (
       e: any,
@@ -181,6 +203,7 @@ const CanvasBoard: React.FC = () => {
       } else {
         console.log("out of bounds");
       }
+      switchPlayer();
     },
     [mainBoardLeft, mainBoardRight]
   );
@@ -265,11 +288,58 @@ const CanvasBoard: React.FC = () => {
         for (let i = 0; i < newBeads.length; i++) {
           const attachedBeadIds = getAttachedBeads(newBeads, i);
           if (attachedBeadIds.length >= 2) {
-            newBeads = newBeads.filter(
-              (bead) => !attachedBeadIds.includes(bead.id)
-            );
-            console.log("Group of 3 or more beads removed:", attachedBeadIds);
-
+            // newBeads = newBeads.filter(
+            //   (bead) => !attachedBeadIds.includes(bead.id)
+            // );
+            // console.log("Group of 3 or more beads removed:", attachedBeadIds);
+            setRemovingBeads(new Set(attachedBeadIds));
+            setTimeout(() => {
+              setOnBoardBeads((prevBeads) =>
+                prevBeads.filter((bead) => !attachedBeadIds.includes(bead.id))
+              );
+              setRemovingBeads(new Set());
+            }, 500); // Duration of the animation
+            if (currentPlayer === 1) {
+              // setPlayer1Points(
+              //   (prevPoints) => prevPoints - attachedBeadIds.length
+              // );
+              setPlayer1Attract(attachedBeadIds.length);
+              setPlayer2Attract(0);
+              // const player1Coordinates = getPlayerCollectionCoordinates(true);
+              // const updatedBeads = newBeads
+              //   .filter((bead) => attachedBeadIds.includes(bead.id))
+              //   .map((bead, index) => ({
+              //     ...bead,
+              //     x: player1Coordinates[index % player1Coordinates.length].x,
+              //     y: player1Coordinates[index % player1Coordinates.length].y,
+              //   }));
+              // setPlayer1Beads((prevBeads) => [...prevBeads, ...updatedBeads]);
+              console.log(
+                "Player 1 points:",
+                player1Points,
+                attachedBeadIds.length
+              );
+            } else if (currentPlayer === 2) {
+              setPlayer2Attract(attachedBeadIds.length);
+              setPlayer1Attract(0);
+              // setPlayer2Points(
+              //   (prevPoints) => prevPoints - attachedBeadIds.length
+              // );
+              // const player2Coordinates = getPlayerCollectionCoordinates(false);
+              // const updatedBeads = newBeads
+              //   .filter((bead) => attachedBeadIds.includes(bead.id))
+              //   .map((bead, index) => ({
+              //     ...bead,
+              //     x: player2Coordinates[index % player2Coordinates.length].x,
+              //     y: player2Coordinates[index % player2Coordinates.length].y,
+              //   }));
+              // setPlayer2Beads((prevBeads) => [...prevBeads, ...updatedBeads]);
+              console.log(
+                "Player 2 points:",
+                player2Points,
+                attachedBeadIds.length
+              );
+            }
             break;
           }
         }
@@ -295,16 +365,22 @@ const CanvasBoard: React.FC = () => {
         >
           <Layer>
             <Group>
+              <Text text={`Player 1 - ${player1Points}`} x={10} y={10} />
               <Rect
                 x={0}
                 y={0}
                 width={mainBoardLeft}
                 height={stageHeight}
-                fill="rgba(0,0,255,0.1)"
+                fill={
+                  !(currentPlayer === 1)
+                    ? "rgba(0,0,255,0.1)"
+                    : "rgba(255,0,0,0.1)"
+                }
               />
               {player1beads.map((bead) => (
                 <MagneticBead
                   bead={bead}
+                  draggable={currentPlayer === 1}
                   handleDragMove={(e) =>
                     handleDragMove(e, bead.id, setPlayer1Beads)
                   }
@@ -316,15 +392,25 @@ const CanvasBoard: React.FC = () => {
           </Layer>
           <Layer>
             <Group>
+              <Text
+                text={`Player 2-${player2Points}`}
+                x={stageWidth - 80}
+                y={10}
+              />
               <Rect
                 x={mainBoardRight}
                 y={0}
                 width={stageWidth - mainBoardRight}
                 height={stageHeight}
-                fill="rgba(0,0,255,0.1)"
+                fill={
+                  !(currentPlayer === 2)
+                    ? "rgba(0,0,255,0.1)"
+                    : "rgba(255,0,0,0.1)"
+                }
               />
               {player2beads.map((bead) => (
                 <MagneticBead
+                  draggable={currentPlayer === 2}
                   bead={bead}
                   handleDragMove={(e) =>
                     handleDragMove(e, bead.id, setPlayer2Beads)
@@ -336,7 +422,7 @@ const CanvasBoard: React.FC = () => {
             </Group>
           </Layer>
           <Layer>
-            {onBoardBeads.map((bead) => (
+            {/* {onBoardBeads.map((bead) => (
               <MagneticBead
                 bead={bead}
                 handleDragMove={(e) =>
@@ -345,6 +431,25 @@ const CanvasBoard: React.FC = () => {
                 handleDragEnd={(e) => handleDragEnd(e, bead.id, false, false)}
                 key={bead.id}
               />
+            ))} */}
+            {onBoardBeads.map((bead) => (
+              //@ts-ignore
+              // <animated.Group
+              //   key={bead.id}
+              //   {...useSpring({
+              //     opacity: removingBeads.has(bead.id) ? 0 : 1,
+              //     config: { duration: 500 },
+              //   })}
+              // >
+              <OnBoardMagneticBead
+                bead={bead}
+                handleDragMove={(e) =>
+                  handleDragMove(e, bead.id, setOnBoardBeads)
+                }
+                handleDragEnd={(e) => handleDragEnd(e, bead.id, false, false)}
+                key={bead.id}
+              />
+              // </animated.Group>
             ))}
           </Layer>
         </Stage>
