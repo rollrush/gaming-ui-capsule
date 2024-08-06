@@ -21,6 +21,10 @@ const menuItems = [
     name: "Diceup",
     href: "/games/diceup",
   },
+  {
+    name: "Magnetic Chess",
+    href: "/games/can",
+  },
 ];
 
 function Navbar() {
@@ -136,6 +140,14 @@ function Navbar() {
                     to="/games/diceup"
                   >
                     Dice Up
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="bg-gray-700 mt-2 text-yellow-600 hover:text-white hover:bg-yellow-600 active:text-red-500"
+                    to="/games/can"
+                  >
+                    Magnetic chess
                   </Link>
                 </li>
               </ul>
