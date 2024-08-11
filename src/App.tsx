@@ -7,6 +7,7 @@ import Diceup from "./pages/Diceup";
 import Roulette from "./pages/Roulette";
 import CoinToss from "./pages/CoinToss";
 import CanvasBoard from "./pages/CanvasBoard";
+import MagneticBeads from "./pages/MagneticBeads";
 // import './style.css';
 
 function App() {
@@ -128,6 +129,7 @@ function App() {
         <Route path="/games/diceup" element={<Diceup />} />
         <Route path="/games/coin" element={<CoinToss />} />
         <Route path="/games/can" element={<CanvasBoard />} />
+        <Route path="/games/magneticbeads" element={<CoinToss />} />
       </Routes>
       {showButton && (
         <button

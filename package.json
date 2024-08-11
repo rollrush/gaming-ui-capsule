@@ -13,7 +13,7 @@
   "dependencies": {
     "@react-spring/konva": "^9.7.4",
     "@react-three/drei": "^9.109.2",
-    "@react-three/fiber": "^8.16.8",
+    "@react-three/fiber": "^8.17.5",
     "@types/three": "^0.167.1",
     "@usecapsule/core-sdk": "^1.19.0",
     "@usecapsule/ethers-v6-integration": "1.3.0",
