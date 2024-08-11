@@ -7,8 +7,9 @@ import Diceup from "./pages/Diceup";
 import Roulette from "./pages/Roulette";
 import CoinToss from "./pages/CoinToss";
 import CanvasBoard from "./pages/CanvasBoard";
-import MagneticBeads from "./pages/MagneticBeads";
-// import './style.css';
+import Slotgame from "./pages/Slotgame";
+// import MagneticBeads from "./pages/MagneticBeads";
+// import "./style copy.css";
 
 function App() {
   const location = useLocation();
@@ -121,7 +122,7 @@ function App() {
   const showButton = location.pathname !== "/";
 
   return (
-    <div className="mybg">
+    <>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -130,6 +131,7 @@ function App() {
         <Route path="/games/coin" element={<CoinToss />} />
         <Route path="/games/can" element={<CanvasBoard />} />
         <Route path="/games/magneticbeads" element={<CoinToss />} />
+        <Route path="/games/slotgame" element={<Slotgame />} />
       </Routes>
       {showButton && (
         <button
@@ -139,7 +141,7 @@ function App() {
           {gameState}
         </button>
       )}
-    </div>
+    </>
   );
 }
 

@@ -92,13 +92,17 @@ const MagneticBeads = () => {
           player="Player 2"
         />
         {/* Example beads */}
-        {/* <Bead position={[-2, 0.2, 6.5]} color="red" />
-      <Bead position={[0, 0.2, 6.5]} color="red" />
-      <Bead position={[2, 0.2, 6.5]} color="red" />
-      <Bead position={[-2, 0.2, -6.5]} color="blue" />
-      <Bead position={[0, 0.2, -6.5]} color="blue" />
-      <Bead position={[2, 0.2, -6.5]} color="blue" /> */}
-        <OrbitControls enableRotate={true} enableZoom={false} />
+        <Bead
+          position={[-2, 1, 6.5]}
+          color="red"
+          onClick={(e) => console.log("clicked")}
+        />
+        <Bead position={[0, 1, 6.5]} color="red" />
+        <Bead position={[2, 1, 6.5]} color="red" />
+        <Bead position={[-2, 1.5, 7.5]} color="blue" />
+        <Bead position={[0, 1.5, 7.5]} color="blue" />
+        <Bead position={[2, 1.5, 7.5]} color="blue" />
+        <OrbitControls enableRotate={false} />
       </Canvas>
     </div>
   );
