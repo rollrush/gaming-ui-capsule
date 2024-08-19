@@ -16,12 +16,12 @@ type State = {
   updateCoins: (amount: number) => void;
 
   // Fruits (results)
-  fruit0: Fruit | "";
-  setFruit0: (fr: Fruit | "") => void;
-  fruit1: Fruit | "";
-  setFruit1: (fr: Fruit | "") => void;
-  fruit2: Fruit | "";
-  setFruit2: (fr: Fruit | "") => void;
+  fruit0: Fruit;
+  setFruit0: (fr: Fruit) => void;
+  fruit1: Fruit;
+  setFruit1: (fr: Fruit) => void;
+  fruit2: Fruit;
+  setFruit2: (fr: Fruit) => void;
 
   // Segments
   // receivedSegments: number[];
@@ -93,24 +93,24 @@ const useGame = create<State>()(
      * Fruits
      *
      */
-    fruit0: "",
-    setFruit0: (fr: Fruit | "") => {
+    fruit0: Fruit.none,
+    setFruit0: (fr: Fruit) => {
       set(() => {
         return {
           fruit0: fr,
         };
       });
     },
-    fruit1: "",
-    setFruit1: (fr: Fruit | "") => {
+    fruit1: Fruit.none,
+    setFruit1: (fr: Fruit) => {
       set(() => {
         return {
           fruit1: fr,
         };
       });
     },
-    fruit2: "",
-    setFruit2: (fr: Fruit | "") => {
+    fruit2: Fruit.none,
+    setFruit2: (fr: Fruit) => {
       set(() => {
         return {
           fruit2: fr,

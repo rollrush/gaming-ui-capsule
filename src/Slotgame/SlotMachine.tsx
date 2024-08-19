@@ -16,6 +16,7 @@ import { WHEEL_SEGMENT } from "./utils/constants";
 import Reel from "./Reel";
 import Button from "./Button";
 import Bars from "./Bars";
+import { Fruit } from "./utils/enums";
 // import Casing from "./Casing";
 // import Bars from "./Bars";
 
@@ -32,9 +33,9 @@ interface SlotMachineProps {
 
 const SlotMachine = forwardRef(({ value }: SlotMachineProps, ref) => {
   // const valuesUrl = useGame((state) => state.valuesUrl);
-  const fruit0 = useGame((state) => state.fruit0);
-  const fruit1 = useGame((state) => state.fruit1);
-  const fruit2 = useGame((state) => state.fruit2);
+  const fruit0: Fruit = useGame((state) => state.fruit0);
+  const fruit1: Fruit = useGame((state) => state.fruit1);
+  const fruit2: Fruit = useGame((state) => state.fruit2);
   const setFruit0 = useGame((state) => state.setFruit0);
   const setFruit1 = useGame((state) => state.setFruit1);
   const setFruit2 = useGame((state) => state.setFruit2);
@@ -106,9 +107,9 @@ const SlotMachine = forwardRef(({ value }: SlotMachineProps, ref) => {
         reel.reelSpinUntil = 0;
         reel.reelStopSegment = 0;
         // Clear fruits from previous spins
-        setFruit0("");
-        setFruit1("");
-        setFruit2("");
+        setFruit0(Fruit.none);
+        setFruit1(Fruit.none);
+        setFruit2(Fruit.none);
         const stopSegment = getRandomStopSegment();
         devLog(`Stop segment of reel ${reelIndex}: ${stopSegment}`);
 
@@ -163,7 +164,7 @@ const SlotMachine = forwardRef(({ value }: SlotMachineProps, ref) => {
             setTimeout(() => {
               end();
             }, 1000);
-            const fruit = segmentToFruit(i, reel.reelSegment);
+            const fruit = segmentToFruit(0, reel.reelSegment);
 
             if (fruit) {
               switch (i) {

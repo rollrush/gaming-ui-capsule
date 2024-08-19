@@ -9,25 +9,25 @@ const segmentToFruit = (reel: number, segment: number) => {
           return Fruit.cherry;
         // case 1:
         case 9:
-          return Fruit.lemon;
+          return Fruit.crown;
         // case 2:
         case 10:
           return Fruit.lemon;
         // case 3:
         case 11:
-          return Fruit.banana;
+          return Fruit.star;
         // case 4:
         case 12:
-          return Fruit.banana;
+          return Fruit.diamond;
         // case 5:
         case 13:
-          return Fruit.lemon;
+          return Fruit.goldcoin;
         // case 6:
         case 14:
-          return Fruit.apple;
+          return Fruit.seven;
         // case 7:
         case 15:
-          return Fruit.lemon;
+          return Fruit.crown;
       }
       break;
     case 1:
