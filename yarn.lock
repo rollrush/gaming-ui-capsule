@@ -24,6 +24,16 @@
   dependencies:
     regenerator-runtime "^0.14.0"
 
+"@babylonjs/core@^7.22.3":
+  version "7.22.3"
+  resolved "https://registry.yarnpkg.com/@babylonjs/core/-/core-7.22.3.tgz#56a47b6ec33d67469d5a38b555b43d76c8598480"
+  integrity sha512-FsAi3q2YzADpjGnKyueLLJ0BmRpXFckAZXndAb0eTZDoMJEkblF9rCgsDafYuW/GM7+rvCoBVhwU6OwGaRswtQ==
+
+"@babylonjs/loaders@^7.22.3":
+  version "7.22.3"
+  resolved "https://registry.yarnpkg.com/@babylonjs/loaders/-/loaders-7.22.3.tgz#0c9ac07671acafcd69924686f7cd59bb7f85eb86"
+  integrity sha512-C4uJIQSAkHs7eH55PP/We5ykUMjNlYhvJLRc/lmfrAL++RKIQ2QTPPQogdzMF8dvgSUVoMlcPnMzk37JDReFpA==
+
 "@celo/base@3.2.0":
   version "3.2.0"
   resolved "https://registry.npmjs.org/@celo/base/-/base-3.2.0.tgz"
@@ -1083,6 +1093,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/cannon@^0.1.13":
+  version "0.1.13"
+  resolved "https://registry.yarnpkg.com/@types/cannon/-/cannon-0.1.13.tgz#e16c931c77adafe5380cfe27088c430e356f1e18"
+  integrity sha512-Yf5nvCblc/PHGA8/wtTOFd1AdS1EhFmHpyPL/tWRk1CRoFAb0M9Kj52dMUwxmNGAguAeS+9siiNi/hk03hhUEA==
+
 "@types/debounce@^1.2.1":
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/@types/debounce/-/debounce-1.2.4.tgz#cb7e85d9ad5ababfac2f27183e8ac8b576b2abb3"
@@ -1860,6 +1875,11 @@ caniuse-lite@^1.0.30001587, caniuse-lite@^1.0.30001599:
   version "1.0.30001617"
   resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001617.tgz"
   integrity sha512-mLyjzNI9I+Pix8zwcrpxEbGlfqOkF9kM3ptzmKNw5tizSyYwMe+nGLTqMK9cO+0E+Bh6TsBxNAaHWEM8xwSsmA==
+
+cannon@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/cannon/-/cannon-0.6.2.tgz#1e7bc72dd5841982f3c104c2bc578bfa4fb1c572"
+  integrity sha512-n/7wWSXr8KOSvjad2x0fJHgpMepKjOKi+NdSnjfYyijoDBZnp4JQKgPcpv28jlXoWM+N9zVYU09J0A6Qxx+Y7w==
 
 cbor-web@8.1.0:
   version "8.1.0"
@@ -4130,8 +4150,16 @@ strict-uri-encode@^1.0.0:
   resolved "https://registry.npmjs.org/strict-uri-encode/-/strict-uri-encode-1.1.0.tgz"
   integrity sha512-R3f198pcvnB+5IpnBlRkphuE9n46WyVl8I39W/ZUTZLz4nqSP/oLYUrcnJrw462Ds8he4YKMov2efsTIw1BDGQ==
 
-"string-width-cjs@npm:string-width@^4.2.0", string-width@^4.1.0:
-  name string-width-cjs
+"string-width-cjs@npm:string-width@^4.2.0":
+  version "4.2.3"
+  resolved "https://registry.npmjs.org/string-width/-/string-width-4.2.3.tgz"
+  integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
+  dependencies:
+    emoji-regex "^8.0.0"
+    is-fullwidth-code-point "^3.0.0"
+    strip-ansi "^6.0.1"
+
+string-width@^4.1.0:
   version "4.2.3"
   resolved "https://registry.npmjs.org/string-width/-/string-width-4.2.3.tgz"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
@@ -4156,7 +4184,14 @@ string_decoder@^1.0.0, string_decoder@^1.1.1:
   dependencies:
     safe-buffer "~5.2.0"
 
-"strip-ansi-cjs@npm:strip-ansi@^6.0.1", strip-ansi@^6.0.0, strip-ansi@^6.0.1:
+"strip-ansi-cjs@npm:strip-ansi@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.npmjs.org/strip-ansi/-/strip-ansi-6.0.1.tgz"
+  integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
+  dependencies:
+    ansi-regex "^5.0.1"
+
+strip-ansi@^6.0.0, strip-ansi@^6.0.1:
   version "6.0.1"
   resolved "https://registry.npmjs.org/strip-ansi/-/strip-ansi-6.0.1.tgz"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
