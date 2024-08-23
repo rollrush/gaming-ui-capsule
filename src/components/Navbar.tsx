@@ -23,7 +23,7 @@ const menuItems = [
   },
   {
     name: "Magnetic Chess",
-    href: "/games/can",
+    href: "/games/magnetic-chess",
   },
 ];
 
@@ -145,7 +145,7 @@ function Navbar() {
                 <li>
                   <Link
                     className="bg-gray-700 mt-2 text-yellow-600 hover:text-white hover:bg-yellow-600 active:text-red-500"
-                    to="/games/can"
+                    to="/games/magnetic-chess"
                   >
                     Magnetic chess
                   </Link>

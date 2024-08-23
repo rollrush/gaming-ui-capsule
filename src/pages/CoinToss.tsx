@@ -1,7 +1,9 @@
-import MagneticBeads from "./MagneticBeads";
-
 const CoinFlip = () => {
-  return <MagneticBeads />;
+  return (
+    <>
+      <h1>Under Construction</h1>
+    </>
+  );
 };
 
 export default CoinFlip;

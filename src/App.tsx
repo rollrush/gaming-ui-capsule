@@ -129,7 +129,7 @@ function App() {
         <Route path="/games/rollrush" element={<Roulette />} />
         <Route path="/games/diceup" element={<Diceup />} />
         <Route path="/games/coin" element={<CoinToss />} />
-        <Route path="/games/magneticbeads" element={<MagneticBeads />} />
+        <Route path="/games/magnetic-chess" element={<MagneticBeads />} />
         <Route path="/games/slotgame" element={<Slotgame />} />
       </Routes>
       {showButton && (
