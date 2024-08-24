@@ -9,19 +9,26 @@ export class MagneticChessGame {
   private mainBoard: BABYLON.Mesh | null = null;
   private playerBoard1: BABYLON.Mesh | null = null;
   private playerBoard2: BABYLON.Mesh | null = null;
-  private testBoard: BABYLON.Mesh | null = null;
   private chessPieces: BABYLON.Mesh[] = [];
   private player1Beads: BABYLON.Mesh[] = [];
   private player2Beads: BABYLON.Mesh[] = [];
   private mainBoardBeads: BABYLON.Mesh[] = [];
-  //   private player1Score: number = 1;
-  attachedBeadCount: any;
-
+  // private player1Score: number = 10;
+  // private player2Score: number = 10;
+  private currentPlayer: number = 1;
+  // private dropIndicator: BABYLON.Mesh;
   constructor(private canvas: HTMLCanvasElement) {
     this.engine = new BABYLON.Engine(canvas, true);
     this.scene = new BABYLON.Scene(this.engine);
     // this.scene.attachControl(true, true);
     this.createScene();
+    this.setPlayerActive(1);
+  }
+  private logBeadState(): void {
+    console.log("Player 1 beads:", this.player1Beads.length);
+    console.log("Player 2 beads:", this.player2Beads.length);
+    console.log("Main board beads:", this.mainBoardBeads.length);
+    console.log("Current player:", this.currentPlayer);
   }
   private getPlayerBoardBoundaries(board: BABYLON.Mesh): {
     minX: number;
@@ -43,24 +50,6 @@ export class MagneticChessGame {
       this.isOverBoard(piece, this.playerBoard2)
     );
   }
-
-  // private clampToBoardBoundaries(
-  //     piece: BABYLON.Mesh,
-  //     board: BABYLON.Mesh
-  // ): void {
-  //     const boardBoundingBox = board.getBoundingInfo().boundingBox;
-  //     const halfWidth = boardBoundingBox.maximumWorld.x - board.position.x;
-  //     const halfDepth = boardBoundingBox.maximumWorld.z - board.position.z;
-
-  //     piece.position.x = Math.max(
-  //         board.position.x - halfWidth,
-  //         Math.min(piece.position.x, board.position.x + halfWidth)
-  //     );
-  //     piece.position.z = Math.max(
-  //         board.position.z - halfDepth,
-  //         Math.min(piece.position.z, board.position.z + halfDepth)
-  //     );
-  // }
 
   private async createScene(): Promise<void> {
     // Camera setup
@@ -95,8 +84,8 @@ export class MagneticChessGame {
       "this is boudnign info of mainbaord"
     );
 
-    this.playerBoard1 = this.createBoard(-10, 0, 0, 4, 8);
-    this.playerBoard2 = this.createBoard(10, 0, 0, 4, 8);
+    this.playerBoard1 = this.createBoard(-10, 0, 0, 4, 8, "1");
+    this.playerBoard2 = this.createBoard(10, 0, 0, 4, 8, "2");
     console.log(
       this.playerBoard1?.getBoundingInfo().boundingBox,
       "this is boudnign info of plaeyr1"
@@ -120,61 +109,26 @@ export class MagneticChessGame {
     this.scene.registerBeforeRender(() => this.updateMagneticForces());
   }
 
-  private async createBoard2(
-    x: number,
-    y: number,
-    z: number,
-    width: number,
-    depth: number
-  ): Promise<BABYLON.Mesh | null> {
-    const result = await BABYLON.SceneLoader.ImportMeshAsync(
-      "",
-      "/public/models/", // Directory where the GLB file is located
-      "mainboard.glb", // The GLB file name
+  private writeTextOnMesh(mesh: BABYLON.Mesh, text: string): void {
+    var textureGround = new BABYLON.DynamicTexture(
+      "dynamic texture",
+      { width: 512, height: 256 },
       this.scene
     );
-
-    // Assuming your model is the first mesh in the array
-    const importedMesh = result.meshes[0];
-
-    // Ensure it's a Mesh type before continuing
-    if (importedMesh instanceof BABYLON.Mesh) {
-      importedMesh.scaling = new BABYLON.Vector3(width, 0.2, depth);
-      importedMesh.position = new BABYLON.Vector3(x, 0.1, z);
-
-      // Apply physics impostor if necessary
-      // importedMesh.physicsImpostor = new BABYLON.PhysicsImpostor(
-      //   importedMesh,
-      //   BABYLON.PhysicsImpostor.BoxImpostor,
-      //   { mass: 0, restitution: 0.5 },
-      //   this.scene
-      // );
-
-      importedMesh.physicsImpostor = new BABYLON.PhysicsImpostor(
-        importedMesh,
-        BABYLON.PhysicsImpostor.BoxImpostor,
-        { mass: 0, restitution: 0.5, friction: 0.1 },
-        this.scene
-      );
-      importedMesh.physicsImpostor!.physicsBody.showBoundingBox = true;
-      console.log("Main board position:", importedMesh.position);
-      console.log(
-        "Main board bounding box:",
-        importedMesh.getBoundingInfo().boundingBox
-      );
-      return importedMesh;
-    } else {
-      console.error("The imported mesh is not of type BABYLON.Mesh.");
-      return null; // Handle this case as needed
-    }
+    // Left border
+    var materialGround = new BABYLON.StandardMaterial("Mat", this.scene);
+    materialGround.diffuseTexture = textureGround;
+    mesh.material = materialGround;
+    var font = "bold 140px monospace";
+    textureGround.drawText(text, 40, 175, font, "green", "white", true, true);
   }
-
   private createBoard(
     x: number,
     y: number,
     z: number,
     width: number,
-    depth: number
+    depth: number,
+    text?: string
   ): BABYLON.Mesh {
     const board = BABYLON.MeshBuilder.CreateBox(
       "board",
@@ -185,7 +139,8 @@ export class MagneticChessGame {
     const borderHeight = 0.5;
     const borderThickness = 0.2;
 
-    // Left border
+    this.writeTextOnMesh(board, text || "");
+
     const leftBorder = BABYLON.MeshBuilder.CreateBox(
       "leftBorder",
       { width: borderThickness, height: borderHeight, depth: depth },
@@ -317,11 +272,11 @@ export class MagneticChessGame {
         piece2.getAbsolutePosition()
       );
       // console.log("beads attracted", piece1, piece2);
-      console.log(distance);
+      // console.log(distance);
 
       if (distance < snapDistance) {
         this.handleSnap(piece1, piece2);
-        console.log("handleSnap, this is the snap distance", snapDistance);
+        // console.log("handleSnap, this is the snap distance", snapDistance);
       }
     }
   }
@@ -343,10 +298,12 @@ export class MagneticChessGame {
     // Store the initial position
     piece.metadata = {
       initialPosition: piece.position.clone(),
-      currentposition: piece.position.clone(),
+      currentPosition: piece.position.clone(),
       isOnMainBoard: false,
+      isActive: false,
       isDragging: false,
-      player: player,
+      isSnapped: false,
+      // player: player,
     };
 
     // Set material and color
@@ -368,42 +325,56 @@ export class MagneticChessGame {
     dragBehavior.useObjectOrientationForDragging = false;
 
     dragBehavior.onDragStartObservable.add(() => {
+      if (!piece.metadata.isActive) {
+        return; // If the bead is not active, ignore the drag start
+      }
+      console.log("bead clicked");
+
       piece.metadata.isDragging = true;
+
       piece.physicsImpostor!.setLinearVelocity(BABYLON.Vector3.Zero());
       piece.physicsImpostor!.setAngularVelocity(BABYLON.Vector3.Zero());
-      piece.metadata.currentposition = piece.position.clone();
+      piece.metadata.currentPosition = piece.position.clone();
     });
-
+    // dragBehavior.
     dragBehavior.onDragObservable.add(() => {
+      piece.position.y = 3;
       piece.physicsImpostor!.setLinearVelocity(BABYLON.Vector3.Zero());
       piece.physicsImpostor!.setAngularVelocity(BABYLON.Vector3.Zero());
     });
 
     dragBehavior.onDragEndObservable.add(() => {
-      if (piece.metadata.isSnapped) {
+      if (piece.metadata.isSnapped || !piece.metadata.isActive) {
         return;
       }
 
       piece.metadata.isDragging = false;
-      // this.checkAndCorrectPosition(piece);
+      this.checkAndCorrectPosition(piece);
       if (this.isOverBoard(piece, this.mainBoard)) {
-        console.log("inside the is main overboard");
-
+        // console.log("inside the is main overboard");
+        // console.log(this.currentPlayer, "here is the current player");
         this.mainBoardBeads.push(piece);
         piece.metadata.isOnMainBoard = true;
-        if (player === 1) {
+        piece.metadata.isActive = false;
+        if (this.currentPlayer === 1) {
           this.player1Beads = this.player1Beads.filter((p) => p !== piece);
         } else {
           this.player2Beads = this.player2Beads.filter((p) => p !== piece);
         }
+        // this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
+        // console.log("current player", this.currentPlayer);
+        this.switchPlayer();
+        // this.setPlayerActive(this.currentPlayer);
       }
-      console.log("drag end", piece);
-      console.log("player1Beads", this.player1Beads);
-      console.log("player2Beads", this.player2Beads);
-      console.log("mainBoardBeads", this.mainBoardBeads);
+
+      // console.log("drag end", piece);
+      // console.log("player1Beads", this.player1Beads);
+      // console.log("player2Beads", this.player2Beads);
+      // console.log("mainBoardBeads", this.mainBoardBeads);
     });
 
     piece.addBehavior(dragBehavior);
+
     if (player === 1) {
       this.player1Beads.push(piece);
     } else {
@@ -420,8 +391,44 @@ export class MagneticChessGame {
     });
   }
 
+  private setPlayerActive(player: number): void {
+    const activeMaterial = new BABYLON.StandardMaterial(
+      "activeMaterial",
+      this.scene
+    );
+    activeMaterial.diffuseColor = BABYLON.Color3.Green();
+
+    const inactiveMaterial = new BABYLON.StandardMaterial(
+      "inactiveMaterial",
+      this.scene
+    );
+    inactiveMaterial.diffuseColor = BABYLON.Color3.Gray();
+
+    this.player1Beads.forEach((bead) => {
+      bead.metadata.isActive = player === 1;
+      bead.material = player === 1 ? activeMaterial : inactiveMaterial;
+      bead.isPickable = player === 1;
+    });
+
+    this.player2Beads.forEach((bead) => {
+      bead.metadata.isActive = player === 2;
+      bead.material = player === 2 ? activeMaterial : inactiveMaterial;
+      bead.isPickable = player === 2;
+    });
+  }
+
+  // private showDropPoint(bead: BABYLON.Mesh) {
+  //   // Calculate the drop point on the mainboard by projecting the bead's position
+  //   if(this.mainBoard){
+  //     const dropPoint = new BABYLON.Vector3(bead.position.x, this.mainBoard.position.y + 0.1, bead.position.z);
+  //     // Position the drop indicator at the calculated drop point
+  //     this.dropIndicator.position = dropPoint;
+  //     this.dropIndicator.isVisible = true;
+  //   }
+
+  // }
   private checkAndCorrectPosition(piece: BABYLON.Mesh): void {
-    if (!this.isOverAnyBoard(piece)) {
+    if (!this.isOverAnyBoard(piece) && piece.metadata.isSnapped) {
       // If the piece is not over any board or has fallen below a certain height,
       // return it to its initial position
       console.log(
@@ -431,18 +438,26 @@ export class MagneticChessGame {
       );
 
       piece.position = (
-        piece.metadata.currentposition as BABYLON.Vector3
+        piece.metadata.currentPosition as BABYLON.Vector3
+      ).clone();
+      piece.physicsImpostor!.setLinearVelocity(BABYLON.Vector3.Zero());
+      piece.physicsImpostor!.setAngularVelocity(BABYLON.Vector3.Zero());
+    } else if (!this.isOverAnyBoard(piece)) {
+      // If the piece is over a board, ensure it stays at a minimum height
+      // piece.position.y = Math.max(piece.position.y, 0.4);
+
+      piece.position = (
+        piece.metadata.currentPosition as BABYLON.Vector3
       ).clone();
       piece.physicsImpostor!.setLinearVelocity(BABYLON.Vector3.Zero());
       piece.physicsImpostor!.setAngularVelocity(BABYLON.Vector3.Zero());
     } else {
-      // If the piece is over a board, ensure it stays at a minimum height
       piece.position.y = Math.max(piece.position.y, 0.4);
     }
   }
   private handleSnap(piece1: BABYLON.Mesh, piece2: BABYLON.Mesh): void {
     // const snappingPlayer = piece1.metadata.player || piece2.metadata.player;
-
+    // this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
     if (
       this.isOverBoard(piece1, this.mainBoard) &&
       this.isOverBoard(piece2, this.mainBoard) &&
@@ -452,22 +467,31 @@ export class MagneticChessGame {
       //   const snappingPlayer = piece1.metadata.player || piece2.metadata.player;
       // Log the IDs of the beads that are attracted
       console.log(
-        `Beads attracted on the main board: ${piece1.id} and ${piece2.id}`
+        `Beads attracted on the main board: ${piece1.id} and ${piece2.id}`,
+        "this is current player",
+        this.currentPlayer
       );
+      piece1.metadata.isSnapped = true;
+      piece2.metadata.isSnapped = true;
 
-      this.moveToPlayerBoard(piece1, 1);
-      this.moveToPlayerBoard(piece2, 1);
+      this.moveToPlayerBoard(piece1);
+      this.moveToPlayerBoard(piece2);
+
+      // this.switchPlayer();
 
       // Remove the beads from the main board arrays
       this.mainBoardBeads = this.mainBoardBeads.filter(
         (p) => p !== piece1 && p !== piece2
       );
+      // this.switchPlayer();
     }
   }
-  private moveToPlayerBoard(piece: BABYLON.Mesh, player: number): void {
-    if (player === 1 && this.playerBoard1) {
+  private moveToPlayerBoard(piece: BABYLON.Mesh): void {
+    const activeBoard =
+      this.currentPlayer === 1 ? this.playerBoard2 : this.playerBoard1;
+    if (activeBoard) {
       // Get the boundaries of the player1 board
-      const boundaries = this.getPlayerBoardBoundaries(this.playerBoard1);
+      const boundaries = this.getPlayerBoardBoundaries(activeBoard);
 
       // Generate random positions within the boundaries
       const randomX =
@@ -478,7 +502,7 @@ export class MagneticChessGame {
       // Target position on the player1 board
       const targetPosition = new BABYLON.Vector3(
         randomX,
-        this.playerBoard1.position.y + 0.5, // Slightly above the board
+        activeBoard.position.y + 0.5, // Slightly above the board
         randomZ
       );
 
@@ -497,7 +521,7 @@ export class MagneticChessGame {
       ];
 
       animation.setKeys(keys);
-
+      piece.metadata.currentPosition = targetPosition;
       piece.animations = [];
       piece.animations.push(animation);
 
@@ -506,17 +530,49 @@ export class MagneticChessGame {
       // snapSound.play();
 
       // Start animation and update piece's final position
-      this.scene.beginAnimation(piece, 0, 30, false, 1, () => {
+      // this.mainBoardBeads = this.mainBoardBeads.filter((p) => p !== piece);
+      this.scene.beginAnimation(piece, 0, 10, false, 0.7, () => {
         piece.position = targetPosition;
+        piece.metadata.isOnMainBoard = false;
+        piece.metadata.isActive = true;
 
-        // Add the piece to Player 1's bead collection
-        this.player1Beads.push(piece);
+        // Add the piece to the current player's bead collection
+        if (this.currentPlayer === 2) {
+          this.player1Beads.push(piece);
+        } else {
+          this.player2Beads.push(piece);
+        }
+        piece.isPickable = false;
+        piece.metadata.isActive = false;
+        const inactiveMaterial = new BABYLON.StandardMaterial(
+          "inactiveMaterial",
+          this.scene
+        );
+        inactiveMaterial.diffuseColor = BABYLON.Color3.Gray();
+        piece.material = inactiveMaterial;
+        // Remove from main board beads
+        this.mainBoardBeads = this.mainBoardBeads.filter((p) => p !== piece);
 
         // Optionally update physics
         piece.physicsImpostor!.setLinearVelocity(BABYLON.Vector3.Zero());
         piece.physicsImpostor!.setAngularVelocity(BABYLON.Vector3.Zero());
+
+        piece.metadata.isSnapped = false;
+
+        // Log updated state
+        this.logBeadState();
       });
     }
+    console.log("player1 beads", this.player1Beads.length);
+    console.log("player2 beads", this.player2Beads.length);
+    console.log(
+      "main board beads",
+      this.mainBoardBeads.length,
+      "current player",
+      this.currentPlayer
+    );
+
+    piece.metadata.isSnapped = false;
   }
 
   private isOverAnyBoard(piece: BABYLON.Mesh): boolean {
@@ -530,6 +586,11 @@ export class MagneticChessGame {
       //  onsole.log("retrunde false", board, this.mainBoard);
     }
     return false;
+  }
+
+  private switchPlayer(): void {
+    this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
+    this.setPlayerActive(this.currentPlayer);
   }
 
   private isOverBoard(
@@ -567,11 +628,6 @@ export class MagneticChessGame {
   }
 }
 
-// Usage
-// const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
-// const game = new MagneticChessGame(canvas);
-// game.run();
-
 const MagneticBeads = () => {
   useEffect(() => {
     console.log("useEffect");
@@ -583,7 +639,12 @@ const MagneticBeads = () => {
     console.log("content loaded");
   });
   return (
-    <canvas id="renderCanvas" style={{ width: "100%", height: "90%" }}></canvas>
+    <>
+      <canvas
+        id="renderCanvas"
+        style={{ width: "100%", height: "90%" }}
+      ></canvas>
+    </>
   );
 };
 
