@@ -6,9 +6,10 @@ export class MagneticChessGame {
   private scene: BABYLON.Scene;
   private engine: BABYLON.Engine;
   private camera: BABYLON.ArcRotateCamera | undefined;
-  private mainBoard: BABYLON.Mesh | undefined;
-  private playerBoard1: BABYLON.Mesh | undefined;
-  private playerBoard2: BABYLON.Mesh | undefined;
+  private mainBoard: BABYLON.Mesh | null = null;
+  private playerBoard1: BABYLON.Mesh | null = null;
+  private playerBoard2: BABYLON.Mesh | null = null;
+  private testBoard: BABYLON.Mesh | null = null;
   private chessPieces: BABYLON.Mesh[] = [];
   private player1Beads: BABYLON.Mesh[] = [];
   private player2Beads: BABYLON.Mesh[] = [];
@@ -61,7 +62,7 @@ export class MagneticChessGame {
   //     );
   // }
 
-  private createScene(): void {
+  private async createScene(): Promise<void> {
     // Camera setup
     this.camera = new BABYLON.ArcRotateCamera(
       "camera",
@@ -89,11 +90,26 @@ export class MagneticChessGame {
 
     // Create boards
     this.mainBoard = this.createBoard(0, 0, 0, 8, 8);
+    console.log(
+      this.mainBoard?.getBoundingInfo().boundingBox,
+      "this is boudnign info of mainbaord"
+    );
+
     this.playerBoard1 = this.createBoard(-10, 0, 0, 4, 8);
     this.playerBoard2 = this.createBoard(10, 0, 0, 4, 8);
+    console.log(
+      this.playerBoard1?.getBoundingInfo().boundingBox,
+      "this is boudnign info of plaeyr1"
+    );
+    // console.log(
+    //   this.playerBoard2?.getBoundingInfo(),
+    //   "this is boudnign info of player2"
+    // );
 
+    // // this.testBoard = await this.createBoard2(0, 0, 0, 6, 6);
     // Create some example chess pieces
     this.createChessPiece(-10, 2, 0, BABYLON.Color3.Green(), 1);
+
     this.createChessPiece(-10, 2, 1, BABYLON.Color3.Green(), 1);
     this.createChessPiece(-10, 2, 2, BABYLON.Color3.Green(), 1);
     this.createChessPiece(-10, 2, 3, BABYLON.Color3.Green(), 1);
@@ -102,6 +118,55 @@ export class MagneticChessGame {
     this.createChessPiece(10, 2, 3, BABYLON.Color3.Yellow(), 2);
     this.createChessPiece(10, 2, 2, BABYLON.Color3.Yellow(), 2);
     this.scene.registerBeforeRender(() => this.updateMagneticForces());
+  }
+
+  private async createBoard2(
+    x: number,
+    y: number,
+    z: number,
+    width: number,
+    depth: number
+  ): Promise<BABYLON.Mesh | null> {
+    const result = await BABYLON.SceneLoader.ImportMeshAsync(
+      "",
+      "/public/models/", // Directory where the GLB file is located
+      "mainboard.glb", // The GLB file name
+      this.scene
+    );
+
+    // Assuming your model is the first mesh in the array
+    const importedMesh = result.meshes[0];
+
+    // Ensure it's a Mesh type before continuing
+    if (importedMesh instanceof BABYLON.Mesh) {
+      importedMesh.scaling = new BABYLON.Vector3(width, 0.2, depth);
+      importedMesh.position = new BABYLON.Vector3(x, 0.1, z);
+
+      // Apply physics impostor if necessary
+      // importedMesh.physicsImpostor = new BABYLON.PhysicsImpostor(
+      //   importedMesh,
+      //   BABYLON.PhysicsImpostor.BoxImpostor,
+      //   { mass: 0, restitution: 0.5 },
+      //   this.scene
+      // );
+
+      importedMesh.physicsImpostor = new BABYLON.PhysicsImpostor(
+        importedMesh,
+        BABYLON.PhysicsImpostor.BoxImpostor,
+        { mass: 0, restitution: 0.5, friction: 0.1 },
+        this.scene
+      );
+      importedMesh.physicsImpostor!.physicsBody.showBoundingBox = true;
+      console.log("Main board position:", importedMesh.position);
+      console.log(
+        "Main board bounding box:",
+        importedMesh.getBoundingInfo().boundingBox
+      );
+      return importedMesh;
+    } else {
+      console.error("The imported mesh is not of type BABYLON.Mesh.");
+      return null; // Handle this case as needed
+    }
   }
 
   private createBoard(
@@ -116,11 +181,98 @@ export class MagneticChessGame {
       { width: width, height: 0.2, depth: depth },
       this.scene
     );
+    // Create borders
+    const borderHeight = 0.5;
+    const borderThickness = 0.2;
+
+    // Left border
+    const leftBorder = BABYLON.MeshBuilder.CreateBox(
+      "leftBorder",
+      { width: borderThickness, height: borderHeight, depth: depth },
+      this.scene
+    );
+    leftBorder.position = new BABYLON.Vector3(
+      x - width / 2 - borderThickness / 2,
+      y + borderHeight / 2,
+      z
+    );
+
+    // Right border
+    const rightBorder = BABYLON.MeshBuilder.CreateBox(
+      "rightBorder",
+      { width: borderThickness, height: borderHeight, depth: depth },
+      this.scene
+    );
+    rightBorder.position = new BABYLON.Vector3(
+      x + width / 2 + borderThickness / 2,
+      y + borderHeight / 2,
+      z
+    );
+
+    // Front border
+    const frontBorder = BABYLON.MeshBuilder.CreateBox(
+      "frontBorder",
+      {
+        width: width + 2 * borderThickness,
+        height: borderHeight,
+        depth: borderThickness,
+      },
+      this.scene
+    );
+    frontBorder.position = new BABYLON.Vector3(
+      x,
+      y + borderHeight / 2,
+      z - depth / 2 - borderThickness / 2
+    );
+
+    // Back border
+    const backBorder = BABYLON.MeshBuilder.CreateBox(
+      "backBorder",
+      {
+        width: width + 2 * borderThickness,
+        height: borderHeight,
+        depth: borderThickness,
+      },
+      this.scene
+    );
+    backBorder.position = new BABYLON.Vector3(
+      x,
+      y + borderHeight / 2,
+      z + depth / 2 + borderThickness / 2
+    );
+
     board.position = new BABYLON.Vector3(x, y, z);
     board.physicsImpostor = new BABYLON.PhysicsImpostor(
       board,
       BABYLON.PhysicsImpostor.BoxImpostor,
-      { mass: 0, restitution: 0.9 },
+      { mass: 0, restitution: 0.1, friction: 0.8 },
+      this.scene
+    );
+    leftBorder.physicsImpostor = new BABYLON.PhysicsImpostor(
+      leftBorder,
+      BABYLON.PhysicsImpostor.BoxImpostor,
+      { mass: 0, restitution: 0.1, friction: 0.8 },
+      this.scene
+    );
+
+    rightBorder.physicsImpostor = new BABYLON.PhysicsImpostor(
+      rightBorder,
+      BABYLON.PhysicsImpostor.BoxImpostor,
+      { mass: 0, restitution: 0.1, friction: 0.8 },
+      this.scene
+    );
+
+    frontBorder.physicsImpostor = new BABYLON.PhysicsImpostor(
+      frontBorder,
+      BABYLON.PhysicsImpostor.BoxImpostor,
+      { mass: 0, restitution: 0.1, friction: 0.8 },
+      this.scene
+    );
+
+    backBorder.physicsImpostor = new BABYLON.PhysicsImpostor(
+      backBorder,
+      BABYLON.PhysicsImpostor.BoxImpostor,
+      { mass: 0, restitution: 0.1, friction: 0.8 },
       this.scene
     );
     return board;
@@ -174,13 +326,6 @@ export class MagneticChessGame {
     }
   }
 
-  // private handleSnap(piece1: BABYLON.Mesh, piece2: BABYLON.Mesh): void {
-  //     const snappingPlayer = piece1.metadata.player || piece2.metadata.player;
-  //     if (snappingPlayer === this.currentPlayer) {
-  //         this.moveToPlayerBoard(piece1, snappingPlayer);
-  //         this.moveToPlayerBoard(piece2, snappingPlayer);
-  //     }
-  // }
   private createChessPiece(
     x: number,
     y: number,
@@ -240,8 +385,10 @@ export class MagneticChessGame {
       }
 
       piece.metadata.isDragging = false;
-      this.checkAndCorrectPosition(piece);
+      // this.checkAndCorrectPosition(piece);
       if (this.isOverBoard(piece, this.mainBoard)) {
+        console.log("inside the is main overboard");
+
         this.mainBoardBeads.push(piece);
         piece.metadata.isOnMainBoard = true;
         if (player === 1) {
@@ -315,14 +462,6 @@ export class MagneticChessGame {
       this.mainBoardBeads = this.mainBoardBeads.filter(
         (p) => p !== piece1 && p !== piece2
       );
-
-      // Increase the attached bead count
-      // this.attachedBeadCount++;
-      // this.player1Beads = this.player1Beads.filter((p) => p !== piece1);
-
-      // Optionally move the beads to the player's board
-      // this.moveToPlayerBoard(piece1, snappingPlayer);
-      // this.moveToPlayerBoard(piece2, snappingPlayer);
     }
   }
   private moveToPlayerBoard(piece: BABYLON.Mesh, player: number): void {
@@ -380,41 +519,34 @@ export class MagneticChessGame {
     }
   }
 
-  //   private getRandomPositionOnBoard(board: BABYLON.Mesh): BABYLON.Vector3 {
-  //     const boardBoundingBox = board.getBoundingInfo().boundingBox;
-  //     const x =
-  //       Math.random() *
-  //         (boardBoundingBox.maximumWorld.x - boardBoundingBox.minimumWorld.x) +
-  //       boardBoundingBox.minimumWorld.x;
-  //     const z =
-  //       Math.random() *
-  //         (boardBoundingBox.maximumWorld.z - boardBoundingBox.minimumWorld.z) +
-  //       boardBoundingBox.minimumWorld.z;
-  //     return new BABYLON.Vector3(x, board.position.y + 0.5, z);
-  //   }
-
   private isOverAnyBoard(piece: BABYLON.Mesh): boolean {
     const boards = [this.mainBoard, this.playerBoard1, this.playerBoard2];
     for (const board of boards) {
       if (this.isOverBoard(piece, board)) {
+        // console.log("retrunde true");
+
         return true;
       }
+      //  onsole.log("retrunde false", board, this.mainBoard);
     }
     return false;
   }
 
   private isOverBoard(
     piece: BABYLON.Mesh,
-    board: BABYLON.Mesh | undefined
+    board: BABYLON.Mesh | null
   ): boolean {
-    // console.log("board", board);
-
     if (!board) {
+      // console.log("this is not board", board);
+      console.log("false");
+
       return false;
     }
+    // console.log("true");
 
     const boardBoundingBox = board.getBoundingInfo().boundingBox;
     const piecePosition = piece.position;
+    // console.log(boardBoundingBox, piecePosition, "bounding box and position");
 
     return (
       piecePosition.x >= boardBoundingBox.minimumWorld.x &&
@@ -427,6 +559,7 @@ export class MagneticChessGame {
     this.engine.runRenderLoop(() => {
       this.scene.render();
     });
+    // this.scene.debugLayer.show();
 
     window.addEventListener("resize", () => {
       this.engine.resize();
