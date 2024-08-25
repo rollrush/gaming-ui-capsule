@@ -2,6 +2,7 @@ import * as BABYLON from "@babylonjs/core";
 import * as CANNON from "cannon";
 import "@babylonjs/loaders";
 import { useEffect } from "react";
+import * as GUI from "@babylonjs/gui";
 export class MagneticChessGame {
   private scene: BABYLON.Scene;
   private engine: BABYLON.Engine;
@@ -13,9 +14,13 @@ export class MagneticChessGame {
   private player1Beads: BABYLON.Mesh[] = [];
   private player2Beads: BABYLON.Mesh[] = [];
   private mainBoardBeads: BABYLON.Mesh[] = [];
-  // private player1Score: number = 10;
-  // private player2Score: number = 10;
+  private player1Score: number = 10;
+  private player2Score: number = 10;
   private currentPlayer: number = 1;
+  private player1ScoreText: GUI.TextBlock | null = null;
+  private player2ScoreText: GUI.TextBlock | null = null;
+  private mainBoardText: GUI.TextBlock | null = null;
+
   // private dropIndicator: BABYLON.Mesh;
   constructor(private canvas: HTMLCanvasElement) {
     this.engine = new BABYLON.Engine(canvas, true);
@@ -78,7 +83,7 @@ export class MagneticChessGame {
     );
 
     // Create boards
-    this.mainBoard = this.createBoard(0, 0, 0, 8, 8);
+    this.mainBoard = this.createBoard(0, 0, 0, 8, 8, "0");
     console.log(
       this.mainBoard?.getBoundingInfo().boundingBox,
       "this is boudnign info of mainbaord"
@@ -106,22 +111,10 @@ export class MagneticChessGame {
     this.createChessPiece(10, 2, 1, BABYLON.Color3.Yellow(), 2);
     this.createChessPiece(10, 2, 3, BABYLON.Color3.Yellow(), 2);
     this.createChessPiece(10, 2, 2, BABYLON.Color3.Yellow(), 2);
+    this.createGUI();
     this.scene.registerBeforeRender(() => this.updateMagneticForces());
   }
 
-  private writeTextOnMesh(mesh: BABYLON.Mesh, text: string): void {
-    var textureGround = new BABYLON.DynamicTexture(
-      "dynamic texture",
-      { width: 512, height: 256 },
-      this.scene
-    );
-    // Left border
-    var materialGround = new BABYLON.StandardMaterial("Mat", this.scene);
-    materialGround.diffuseTexture = textureGround;
-    mesh.material = materialGround;
-    var font = "bold 140px monospace";
-    textureGround.drawText(text, 40, 175, font, "green", "white", true, true);
-  }
   private createBoard(
     x: number,
     y: number,
@@ -135,11 +128,12 @@ export class MagneticChessGame {
       { width: width, height: 0.2, depth: depth },
       this.scene
     );
+
     // Create borders
     const borderHeight = 0.5;
     const borderThickness = 0.2;
-
-    this.writeTextOnMesh(board, text || "");
+    // #326670
+    // this.writeTextOnMesh(board, text || "");
 
     const leftBorder = BABYLON.MeshBuilder.CreateBox(
       "leftBorder",
@@ -151,7 +145,6 @@ export class MagneticChessGame {
       y + borderHeight / 2,
       z
     );
-
     // Right border
     const rightBorder = BABYLON.MeshBuilder.CreateBox(
       "rightBorder",
@@ -163,7 +156,6 @@ export class MagneticChessGame {
       y + borderHeight / 2,
       z
     );
-
     // Front border
     const frontBorder = BABYLON.MeshBuilder.CreateBox(
       "frontBorder",
@@ -174,12 +166,12 @@ export class MagneticChessGame {
       },
       this.scene
     );
+
     frontBorder.position = new BABYLON.Vector3(
       x,
       y + borderHeight / 2,
       z - depth / 2 - borderThickness / 2
     );
-
     // Back border
     const backBorder = BABYLON.MeshBuilder.CreateBox(
       "backBorder",
@@ -195,7 +187,6 @@ export class MagneticChessGame {
       y + borderHeight / 2,
       z + depth / 2 + borderThickness / 2
     );
-
     board.position = new BABYLON.Vector3(x, y, z);
     board.physicsImpostor = new BABYLON.PhysicsImpostor(
       board,
@@ -230,7 +221,151 @@ export class MagneticChessGame {
       { mass: 0, restitution: 0.1, friction: 0.8 },
       this.scene
     );
+
+    //coloring the board
+
+    const boardMaterail = new BABYLON.StandardMaterial(
+      "boardMaterial",
+      this.scene
+    );
+    const borderMaterial = new BABYLON.StandardMaterial(
+      "borderMaterial",
+      this.scene
+    );
+
+    boardMaterail.diffuseColor = BABYLON.Color3.FromHexString("#16a3be");
+    board.material = boardMaterail;
+    borderMaterial.diffuseColor = BABYLON.Color3.FromHexString("#00d6ff");
+    leftBorder.material = borderMaterial;
+    rightBorder.material = borderMaterial;
+    frontBorder.material = borderMaterial;
+    backBorder.material = borderMaterial;
+
+    const circle = BABYLON.MeshBuilder.CreateDisc(
+      "circle",
+      { radius: Math.min(width, depth) / 5, tessellation: 64 },
+      this.scene
+    );
+    const innerCircle = BABYLON.MeshBuilder.CreateDisc(
+      "innerCircle",
+      { radius: Math.min(width, depth) / 6, tessellation: 64 },
+      this.scene
+    );
+    innerCircle.position = new BABYLON.Vector3(x, y + 0.13, z);
+    innerCircle.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0); // Center the circle on the board
+    const innerCircleMaterial = new BABYLON.StandardMaterial(
+      "innerCircleMaterial",
+      this.scene
+    );
+    innerCircleMaterial.diffuseColor = BABYLON.Color3.FromHexString("#16a3be");
+    innerCircle.material = innerCircleMaterial;
+    circle.position = new BABYLON.Vector3(x, y + 0.12, z);
+    circle.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0); // Center the circle on the board
+    const circleMaterial = new BABYLON.StandardMaterial(
+      "circleMaterial",
+      this.scene
+    );
+    circleMaterial.diffuseColor = BABYLON.Color3.White();
+    circle.material = circleMaterial;
+    if (text) {
+      this.createLineFromCenter(board);
+    }
+    // if (text == "1") {
+    //   this.createFloatingScore(board, this.player1Score, 1);
+    // } else if (text == "2") {
+    //   this.createFloatingScore(board, this.player2Score, 2);
+    // } else if (text == "0") {
+    //   this.createFloatingScore(board, this.currentPlayer, 0);
+    // }
+
     return board;
+  }
+
+  private createGUI(): void {
+    // Player 1 Score Text Block
+    const guiTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+
+    var createRectangle = function () {
+      var rect1 = new GUI.Rectangle();
+      rect1.width = 0.11;
+      rect1.height = "50px";
+      rect1.cornerRadius = 20;
+      rect1.color = "white";
+      rect1.thickness = 4;
+      rect1.background = "#16a3bf";
+      rect1.topInPixels = 180;
+      rect1.shadowOffsetX = 8;
+      rect1.shadowOffsetY = 8;
+      rect1.shadowBlur = 20;
+      guiTexture.addControl(rect1);
+      return rect1;
+    };
+    let rectp1 = createRectangle();
+    let rectp2 = createRectangle();
+    let rectmain = createRectangle();
+    rectmain.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+    rectmain.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+    rectmain.topInPixels = 15;
+
+    rectp1.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+    rectp1.leftInPixels = 15;
+    rectp1.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+    rectp2.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+    rectp2.paddingRightInPixels = 15;
+    rectp2.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+    this.player1ScoreText = new GUI.TextBlock();
+    this.player1ScoreText.text = `Player 1 : ${this.player1Score} pts`;
+    this.player1ScoreText.color = "white";
+    this.player1ScoreText.fontSize = 24;
+    this.player1ScoreText.paddingRightInPixels = 30;
+    this.player1ScoreText.textHorizontalAlignment =
+      GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+    this.player1ScoreText.textVerticalAlignment =
+      GUI.Control.VERTICAL_ALIGNMENT_TOP;
+    this.player1ScoreText.paddingTopInPixels = 190;
+    guiTexture.addControl(this.player1ScoreText);
+    this.player2ScoreText = new GUI.TextBlock();
+    this.player2ScoreText.text = `Player 2 : ${this.player2Score} pts`;
+    this.player2ScoreText.color = "white";
+    this.player2ScoreText.fontSize = 24;
+    this.player2ScoreText.paddingLeftInPixels = 30;
+    this.player2ScoreText.textHorizontalAlignment =
+      GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+    this.player2ScoreText.textVerticalAlignment =
+      GUI.Control.VERTICAL_ALIGNMENT_TOP;
+    this.player2ScoreText.paddingTopInPixels = 190;
+    guiTexture.addControl(this.player2ScoreText);
+    this.mainBoardText = new GUI.TextBlock();
+    this.mainBoardText.text = `Player ${this.currentPlayer}'s Turn`;
+    this.mainBoardText.color = "white";
+    this.mainBoardText.fontSize = 24;
+    this.mainBoardText.paddingLeftInPixels = 10;
+    this.mainBoardText.textHorizontalAlignment =
+      GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+    this.mainBoardText.textVerticalAlignment =
+      GUI.Control.VERTICAL_ALIGNMENT_TOP;
+    this.mainBoardText.paddingTopInPixels = 25;
+    guiTexture.addControl(this.mainBoardText);
+  }
+
+  private createLineFromCenter(board: BABYLON.Mesh): void {
+    const lineThickness = 0.15; // Thickness of the line
+    const lineLength = 8; // Length of the line (full width of the board)
+
+    // Create the line
+    const line = BABYLON.MeshBuilder.CreateBox(
+      "line",
+      { height: lineThickness, width: lineLength, depth: lineThickness },
+      this.scene
+    );
+    line.position = new BABYLON.Vector3(0, board.position.y + 0.03, 0);
+    line.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0); // Rotate the line to 45 degrees
+    const lineMaterial = new BABYLON.StandardMaterial(
+      "lineMaterial",
+      this.scene
+    );
+    lineMaterial.diffuseColor = BABYLON.Color3.White();
+    line.material = lineMaterial;
   }
 
   private updateMagneticForces(): void {
@@ -256,7 +391,7 @@ export class MagneticChessGame {
     ) {
       return; // Skip magnetic attraction
     }
-    const magneticStrength = 50; // Increased for stronger effect
+    const magneticStrength = 70; // Increased for stronger effect
     const attractionDistance = 2; // Increased for larger range of effect
     const snapDistance = 0.8;
     const distance = BABYLON.Vector3.Distance(piece1.position, piece2.position);
@@ -271,8 +406,6 @@ export class MagneticChessGame {
         force.scale(-1),
         piece2.getAbsolutePosition()
       );
-      // console.log("beads attracted", piece1, piece2);
-      // console.log(distance);
 
       if (distance < snapDistance) {
         this.handleSnap(piece1, piece2);
@@ -351,8 +484,6 @@ export class MagneticChessGame {
       piece.metadata.isDragging = false;
       this.checkAndCorrectPosition(piece);
       if (this.isOverBoard(piece, this.mainBoard)) {
-        // console.log("inside the is main overboard");
-        // console.log(this.currentPlayer, "here is the current player");
         this.mainBoardBeads.push(piece);
         piece.metadata.isOnMainBoard = true;
         piece.metadata.isActive = false;
@@ -361,16 +492,9 @@ export class MagneticChessGame {
         } else {
           this.player2Beads = this.player2Beads.filter((p) => p !== piece);
         }
-        // this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
-        // console.log("current player", this.currentPlayer);
-        this.switchPlayer();
-        // this.setPlayerActive(this.currentPlayer);
-      }
 
-      // console.log("drag end", piece);
-      // console.log("player1Beads", this.player1Beads);
-      // console.log("player2Beads", this.player2Beads);
-      // console.log("mainBoardBeads", this.mainBoardBeads);
+        this.switchPlayer();
+      }
     });
 
     piece.addBehavior(dragBehavior);
@@ -417,16 +541,6 @@ export class MagneticChessGame {
     });
   }
 
-  // private showDropPoint(bead: BABYLON.Mesh) {
-  //   // Calculate the drop point on the mainboard by projecting the bead's position
-  //   if(this.mainBoard){
-  //     const dropPoint = new BABYLON.Vector3(bead.position.x, this.mainBoard.position.y + 0.1, bead.position.z);
-  //     // Position the drop indicator at the calculated drop point
-  //     this.dropIndicator.position = dropPoint;
-  //     this.dropIndicator.isVisible = true;
-  //   }
-
-  // }
   private checkAndCorrectPosition(piece: BABYLON.Mesh): void {
     if (!this.isOverAnyBoard(piece) && piece.metadata.isSnapped) {
       // If the piece is not over any board or has fallen below a certain height,
@@ -539,9 +653,19 @@ export class MagneticChessGame {
         // Add the piece to the current player's bead collection
         if (this.currentPlayer === 2) {
           this.player1Beads.push(piece);
+          this.player1Score -= 1;
+          if (this.player1ScoreText) {
+            this.player1ScoreText.text = `Player1 Score: ${this.player1Score}`;
+          }
         } else {
           this.player2Beads.push(piece);
+          this.player2Score -= 1;
+          if (this.player2ScoreText) {
+            this.player2ScoreText.text = `Player2 Score: ${this.player2Score}`;
+          }
         }
+        console.log("player1 score", this.player1Score);
+        console.log("player2 score", this.player2Score);
         piece.isPickable = false;
         piece.metadata.isActive = false;
         const inactiveMaterial = new BABYLON.StandardMaterial(
@@ -590,6 +714,9 @@ export class MagneticChessGame {
 
   private switchPlayer(): void {
     this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
+    if (this.mainBoardText) {
+      this.mainBoardText.text = `Player ${this.currentPlayer}'s Turn`;
+    }
     this.setPlayerActive(this.currentPlayer);
   }
 
