@@ -68,6 +68,14 @@ export class MagneticChessGame {
     );
     this.camera.attachControl(this.canvas, true);
 
+    // Set camera constraints
+    this.camera.lowerRadiusLimit = 15; // Minimum distance from the target
+    this.camera.upperRadiusLimit = 45; // Maximum distance from the target
+    this.camera.lowerAlphaLimit = 0.02; // Minimum angle around the Y-axis
+    this.camera.upperAlphaLimit = Math.PI / 2; // Maximum angle around the Y-axis
+    this.camera.lowerBetaLimit = 0.5; // Minimum angle from the Y-axis
+    this.camera.upperBetaLimit = Math.PI / 3; // Maximum angle from the Y-axis
+
     // Light setup
     const light = new BABYLON.HemisphericLight(
       "light",
