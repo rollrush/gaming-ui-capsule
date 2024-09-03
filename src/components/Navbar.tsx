@@ -53,7 +53,7 @@ function Navbar() {
     }
   };
   return (
-    <div className="relative w-full backdrop-blur-md h-max">
+    <div className="relative w-full backdrop-blur-md h-max bg-gradient-to-r from-yellow-900 to-green-900">
       {/* <CapsuleModal
         className=""
         capsule={capsule}
